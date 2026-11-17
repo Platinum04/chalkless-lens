@@ -26,3 +26,6 @@ leaf_plugin_settings.json
 
 # Lens Studio removes .agents/ on every project load (Agents-Docs legacyCleanup); skills live in .claude/skills
 .agents/
+
+# Devpost write-up draft: kept locally, pasted into Devpost on submission day
+devpost/submission.md

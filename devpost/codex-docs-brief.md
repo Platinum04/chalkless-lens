@@ -13,11 +13,11 @@
 - **Other work in progress:** Claude is working in this folder on Lens code (scripts, scene, tests). **This task is docs only.**
 
 ## Your files
-- **New:** `devpost/submission.md`, the Devpost write-up.
+- **New:** `devpost/submission.md`, the Devpost write-up. It's a **local draft only**: it's gitignored, so it never gets committed or pushed. It gets pasted into Devpost on submission day.
 - **Rewrite:** `README.md`.
 - **Don't touch** anything under `Assets/`, `Packages/`, `PROGRESS.md`, `LICENSE` or `.claude/`.
 - **Before you commit,** run `git pull --rebase origin main`.
-- **Stage only** `README.md` and `devpost/submission.md`.
+- **Stage only** `README.md`. Never commit `devpost/submission.md`; it stays local.
 
 ## Writing style (strict)
 - **Human and plain.** Short sentences. Write like a person, not like marketing copy. No hype words ("revolutionary", "seamless", "cutting-edge", "game-changer").
@@ -94,5 +94,5 @@ Keep the current structure: intro, Who it's for, How it works, Styles, the detec
 ## Done when
 - `devpost/submission.md` exists and the README is refreshed.
 - A search finds no "—" in either file.
-- Both are committed and pushed.
+- The README is committed and pushed. `submission.md` stays local and is not committed.
 - You report back with the commit hash and any facts you weren't sure about.
