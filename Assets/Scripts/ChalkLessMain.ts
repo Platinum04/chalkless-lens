@@ -278,7 +278,7 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.pattern.setCurrentStep(this.currentStep)
     this.stepPanel.showStep(st.label, this.currentStep, steps.length, steps[this.currentStep].title)
     this.placeStepPanel()
-    print(`ChalkLess: step ${this.currentStep} ${steps[this.currentStep].id} — ${st.label}`)
+    print(`ChalkLess: step ${this.currentStep} ${steps[this.currentStep].id} · ${st.label}`)
   }
 
   private finish(): void {
@@ -356,7 +356,98 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.measurePad.setMeasurement(d.label, this.measurements[d.key], this.measureIndex, defs.length, this.measureIndex === defs.length - 1, this.recipe.name)
   }
 
+  /**
+   * Cutting stage: put the step card (with its progress dots) right next to the active line so the
+   * leader stays short. Searches positions on the table top; the card must not cover the active
+   * line or its label, prefers not covering other lines and prefers the near (tailor's) side.
+   * Returns false when no spot is free (caller falls back to the beside-the-lay placement).
+   */
+  private placeCardNearActiveLine(): boolean {
+    const obs = this.pattern.stepObstaclesWorld()
+    if (obs.active.length === 0) return false
+    const f = this.fabric.getTransform().getWorldPosition()
+    const fs = this.pattern.fabricSize
+    let bx0 = f.x - fs.x / 2
+    let bx1 = f.x + fs.x / 2
+    let bz0 = f.z - fs.y / 2
+    let bz1 = f.z + fs.y / 2
+    const tt = this.tableObj ? (this.tableObj.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable) : null
+    if (tt) {
+      const tp = this.tableObj.getTransform().getWorldPosition()
+      const ts = tt.currentSize
+      bx0 = Math.min(bx0, tp.x - ts.x / 2)
+      bx1 = Math.max(bx1, tp.x + ts.x / 2)
+      bz0 = Math.min(bz0, tp.z - ts.z / 2)
+      bz1 = Math.max(bz1, tp.z + ts.z / 2)
+    }
+    // Card footprint (local plane) -> world XZ offsets from its centre.
+    const fp = this.stepPanel.footprint
+    const wt = this.stepPanel.getSceneObject().getTransform().getWorldTransform()
+    const ax = wt.multiplyDirection(new vec3(1, 0, 0)).normalize()
+    const ay = wt.multiplyDirection(new vec3(0, 1, 0)).normalize()
+    let dx0 = 1e9
+    let dx1 = -1e9
+    let dz0 = 1e9
+    let dz1 = -1e9
+    for (const lx of [fp.x, fp.z])
+      for (const ly of [fp.y, fp.w]) {
+        const ox = ax.x * lx + ay.x * ly
+        const oz = ax.z * lx + ay.z * ly
+        dx0 = Math.min(dx0, ox)
+        dx1 = Math.max(dx1, ox)
+        dz0 = Math.min(dz0, oz)
+        dz1 = Math.max(dz1, oz)
+      }
+    const M = 1
+    const CLEAR = 3
+    const lab = obs.label
+    let best: vec2 | null = null
+    let bestScore = 1e12
+    const cxMin = bx0 + M - dx0
+    const cxMax = bx1 - M - dx1
+    const czMin = bz0 + M - dz0
+    const czMax = bz1 - M - dz1
+    const tryAt = (cx: number, cz: number): void => {
+      if (cx < cxMin || cx > cxMax || cz < czMin || cz > czMax) return
+      const x0 = cx + dx0
+      const x1 = cx + dx1
+      const z0 = cz + dz0
+      const z1 = cz + dz1
+      if (lab && x0 < Math.max(lab.x, lab.z) + 1 && x1 > Math.min(lab.x, lab.z) - 1 && z0 < Math.max(lab.y, lab.w) + 1 && z1 > Math.min(lab.y, lab.w) - 1) return
+      let d2 = 1e12
+      for (const p of obs.active) {
+        const ddx = p.x < x0 ? x0 - p.x : p.x > x1 ? p.x - x1 : 0
+        const ddz = p.y < z0 ? z0 - p.y : p.y > z1 ? p.y - z1 : 0
+        const d = ddx * ddx + ddz * ddz
+        if (d < CLEAR * CLEAR) return
+        if (d < d2) d2 = d
+      }
+      const dmin = Math.sqrt(d2)
+      if (dmin >= bestScore) return
+      let covered = 0
+      for (const p of obs.other) if (p.x > x0 && p.x < x1 && p.y > z0 && p.y < z1) covered++
+      // Short leader first; covering other lines costs ~1 cm per 5 cm of line; near side preferred.
+      const score = dmin + covered * 0.8 + (bz1 - z1) * 0.12
+      if (score < bestScore) {
+        bestScore = score
+        best = new vec2(cx, cz)
+      }
+    }
+    // Coarse 6 cm grid, then a 1 cm refinement around the best spot.
+    for (let cx = cxMin; cx <= cxMax; cx += 6) for (let cz = czMin; cz <= czMax; cz += 6) tryAt(cx, cz)
+    if (best) {
+      const b = best as vec2
+      for (let ix = -5; ix <= 5; ix++) for (let iz = -5; iz <= 5; iz++) tryAt(b.x + ix, b.y + iz)
+    }
+    if (!best) return false
+    const pos = new vec3(best.x, f.y + 0.6, best.y)
+    this.stepPanel.moveTo(pos)
+    this.stepPanel.setLeaderTarget(this.pattern.currentLineNearestWorld(pos))
+    return true
+  }
+
   private placeStepPanel(): void {
+    if (this.phase === "cutting" && this.placeCardNearActiveLine()) return
     const f = this.fabric.getTransform().getWorldPosition()
     const a = this.pattern.currentLineAnchorWorld()
     const z = Math.min(f.z + 22, Math.max(f.z - 22, a.z))

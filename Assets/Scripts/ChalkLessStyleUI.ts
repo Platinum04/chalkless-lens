@@ -42,14 +42,16 @@ export const BUTTON_LABEL_Z = 0.08
 const FACE_BORDER = new vec4(0.55, 0.9, 1, 1)
 const FACE_FILL = new vec4(0.13, 0.3, 0.38, 1)
 const FACE_HOVER = new vec4(0.25, 0.52, 0.64, 1)
-const FACE_PRESS = new vec4(0.4, 0.72, 0.85, 1)
-const FACE_CONFIRM = new vec4(0.55, 0.95, 1, 1)
+const FACE_PRESS = new vec4(0.2, 0.46, 0.58, 1)
+/** Confirm flash: saturated mid-teal fill (white text stays readable) + a bright white border glow. */
+const FACE_CONFIRM = new vec4(0, 0.5, 0.56, 1)
+const FACE_CONFIRM_BORDER = new vec4(1, 1, 1, 1)
 /** Confirm flash length (s) — quiet motion, under 200 ms. */
 const CONFIRM_S = 0.18
 const FACE_Z = 0.55
 const BORDER_CM = 0.35
 const LABEL_SCALE = 1.2
-type FaceMats = {border: Material; fill: Material; hover: Material; press: Material; confirm: Material}
+type FaceMats = {border: Material; fill: Material; hover: Material; press: Material; confirm: Material; confirmBorder: Material}
 let faceMats: FaceMats | null = null
 function buttonFaceMaterials(): FaceMats {
   if (!faceMats) {
@@ -60,6 +62,7 @@ function buttonFaceMaterials(): FaceMats {
       hover: tintedMaterial(base, FACE_HOVER),
       press: tintedMaterial(base, FACE_PRESS),
       confirm: tintedMaterial(base, FACE_CONFIRM),
+      confirmBorder: tintedMaterial(base, FACE_CONFIRM_BORDER),
     }
   }
   return faceMats
@@ -143,13 +146,13 @@ export function labeledButton(
   const mats = buttonFaceMaterials()
   const face = child(so, name + "Face", new vec3(0, 0, FACE_Z))
   const shape = (cw: number, ch: number, z: number): RenderMesh => (pill ? capsuleMesh(cw, ch, z) : boxMesh(new vec3(0, 0, z), new vec3(cw, ch, 0.05)))
-  meshObject(face, "Border", shape(w, h, 0), mats.border)
+  const border = meshObject(face, "Border", shape(w, h, 0), mats.border)
   const fill = meshObject(face, "Fill", shape(w - BORDER_CM * 2, h - BORDER_CM * 2, 0.06), mats.fill)
   const lo = child(so, name + "Label", new vec3(0, 0, FACE_Z + 0.2))
   const t = makeText(lo, label, role, dist, w - 1.8, h, new vec4(1, 1, 1, 1))
   t.size = t.size * LABEL_SCALE
   t.horizontalOverflow = HorizontalOverflow.Shrink
-  // States: rest (fill) / hover (lighter) / pressed / confirmed (bright flash + ✓ for < 200 ms).
+  // States: rest (fill) / hover (lighter) / pressed / confirmed (white border glow, teal fill + ✓ for < 200 ms).
   const check = child(so, name + "Check", new vec3(w / 2 - Math.min(h, w / 4) / 2 - 0.4, 0, FACE_Z + 0.3))
   const ct = makeText(check, "✓", role, dist, Math.min(h, w / 4), h, new vec4(1, 1, 1, 1))
   ct.size = t.size
@@ -158,6 +161,7 @@ export function labeledButton(
   let confirming = false
   const rest = (): void => {
     fill.mainMaterial = hovered ? mats.hover : mats.fill
+    border.mainMaterial = mats.border
   }
   const flash = button.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
   flash.bind(() => {
@@ -179,6 +183,7 @@ export function labeledButton(
   button.onTriggerUp.add(() => {
     confirming = true
     fill.mainMaterial = mats.confirm
+    border.mainMaterial = mats.confirmBorder
     check.enabled = true
     flash.reset(CONFIRM_S)
   })

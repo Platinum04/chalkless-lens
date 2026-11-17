@@ -378,7 +378,7 @@ export function buildPattern(m: Measurements): PatternGeometry {
   ]
 
   const steps: StepGeometry[] = [
-    {id: "fold", lines: [[[0, -2], [0, L + 2]]], closed: false, centroid: bodyC, marks: [], label: `Fold here — ${r(L)} cm along the fold`},
+    {id: "fold", lines: [[[0, -2], [0, L + 2]]], closed: false, centroid: bodyC, marks: [], label: `Fold here · ${r(L)} cm along the fold`},
     {
       id: "measure",
       lines: [],
@@ -393,13 +393,13 @@ export function buildPattern(m: Measurements): PatternGeometry {
         {a: [sx + cap + 3, 0], b: [sx + cap + 3, sw], label: `Arm ${m.roundSleeve} cm`},
         {a: [0, L - 8], b: [hw, L - 8], label: `Hip ${m.hip} cm`},
       ],
-      label: "Check the marks — neck, shoulder, chest, length, sleeve, hip",
+      label: "Check the marks · neck, shoulder, chest, length, sleeve, hip",
     },
-    cutStep("neckline", [neck], bodyC, `Cut neckline — ${r(polylineLength(neck))} cm curve`),
-    cutStep("shoulder", [shoulder], bodyC, `Cut shoulder — ${r(polylineLength(shoulder))} cm`),
-    cutStep("sleeve", [sleeve], sleeveC, `Cut sleeve — ${r(polylineLength(sleeve))} cm outline`, true),
-    cutStep("sideSeam", [side], bodyC, `Cut side seam — ${r(polylineLength(side))} cm`),
-    cutStep("hem", [hem], bodyC, `Cut hem — ${r(polylineLength(hem))} cm straight`),
+    cutStep("neckline", [neck], bodyC, `Cut neckline · ${r(polylineLength(neck))} cm curve`),
+    cutStep("shoulder", [shoulder], bodyC, `Cut shoulder · ${r(polylineLength(shoulder))} cm`),
+    cutStep("sleeve", [sleeve], sleeveC, `Cut sleeve · ${r(polylineLength(sleeve))} cm outline`, true),
+    cutStep("sideSeam", [side], bodyC, `Cut side seam · ${r(polylineLength(side))} cm`),
+    cutStep("hem", [hem], bodyC, `Cut hem · ${r(polylineLength(hem))} cm straight`),
   ]
 
   return {widthCm: sx + SL, lengthCm: Math.max(L, sw + 2), steps}
@@ -413,6 +413,6 @@ export const BUBA: StyleRecipe = {
   measurements: MEASUREMENTS,
   steps: STEPS,
   build: buildPattern,
-  piecesText: () => "Pieces cut: 3 — front on the fold + 2 sleeves",
+  piecesText: () => "Pieces cut: 3 (front on the fold + 2 sleeves)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }

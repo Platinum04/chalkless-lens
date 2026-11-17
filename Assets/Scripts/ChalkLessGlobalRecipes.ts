@@ -175,15 +175,15 @@ function buildSuit(m: Measurements): PatternGeometry {
   const band = rect(t.right + G, tz, 8, m.waist + 6)
   const c: P2 = [sx / 2, (tz + m.trouserLength) / 2]
   const steps: StepGeometry[] = [
-    fold(L, j.backC, `Fold here — back on the fold, ${r(L)} cm`),
-    measure(c, [...jacketMarks(m, j, sx, sw), ...trouserMarks(m, t, 0, tz, "Leg hem")], "Check the jacket marks — neck, shoulder, chest, waist, length, sleeve"),
-    cutStep("jacketFront", [j.front], j.frontC, `Cut jacket front + lapel — ${len(j.front)} cm outline`, true),
-    cutStep("jacketBack", [j.back], j.backC, `Cut jacket back on the fold — ${len(j.back)} cm`),
-    cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve — ${len(sleeve)} cm outline`, true),
-    cutStep("collar", [collar], [sx + cl / 2, sw + G + 4.5], `Cut collar — ${r(cl)} × 9 cm`, true),
-    cutStep("trouserFront", [t.front], t.frontC, `Cut trouser front — ${len(t.front)} cm outline`, true),
-    cutStep("trouserBack", [t.back], t.backC, `Cut trouser back — ${len(t.back)} cm outline`, true),
-    cutStep("waistband", [band], [t.right + G + 4, tz + (m.waist + 6) / 2], `Cut waistband — ${r(m.waist + 6)} × 8 cm`, true),
+    fold(L, j.backC, `Fold here · back on the fold, ${r(L)} cm`),
+    measure(c, [...jacketMarks(m, j, sx, sw), ...trouserMarks(m, t, 0, tz, "Leg hem")], "Check the jacket marks · neck, shoulder, chest, waist, length, sleeve"),
+    cutStep("jacketFront", [j.front], j.frontC, `Cut jacket front + lapel · ${len(j.front)} cm outline`, true),
+    cutStep("jacketBack", [j.back], j.backC, `Cut jacket back on the fold · ${len(j.back)} cm`),
+    cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve · ${len(sleeve)} cm outline`, true),
+    cutStep("collar", [collar], [sx + cl / 2, sw + G + 4.5], `Cut collar · ${r(cl)} × 9 cm`, true),
+    cutStep("trouserFront", [t.front], t.frontC, `Cut trouser front · ${len(t.front)} cm outline`, true),
+    cutStep("trouserBack", [t.back], t.backC, `Cut trouser back · ${len(t.back)} cm outline`, true),
+    cutStep("waistband", [band], [t.right + G + 4, tz + (m.waist + 6) / 2], `Cut waistband · ${r(m.waist + 6)} × 8 cm`, true),
   ]
   // 197 × 146 cm in one lay is bigger than the table: show the jacket lay, then the trouser lay.
   return splitLay(finishLayout(steps), ["Jacket", "Trousers"], ["trouserFront", "trouserBack", "waistband"])
@@ -207,7 +207,7 @@ const SUIT: StyleRecipe = {
     step("waistband", "Waistband"),
   ],
   build: buildSuit,
-  piecesText: () => "Pieces cut: 12 — jacket: 2 fronts, back on the fold, 2 sleeves, 2 collars; trousers: 2 fronts, 2 backs, waistband",
+  piecesText: () => "Pieces cut: 12 (jacket: 2 fronts, back on the fold, 2 sleeves, 2 collars; trousers: 2 fronts, 2 backs, waistband)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 4),
 }
 
@@ -224,12 +224,12 @@ function buildBlazer(m: Measurements): PatternGeometry {
   const under = sleevePiece(sx, tw + G, uw, m.sleeveLength, uw * 0.75, 5)
   const c: P2 = [sx / 2, L / 2]
   const steps: StepGeometry[] = [
-    fold(L, j.backC, `Fold here — back on the fold, ${r(L)} cm`),
-    measure(c, jacketMarks(m, j, sx, tw), "Check the marks — neck, shoulder, chest, waist, length, sleeve"),
-    cutStep("front", [j.front], j.frontC, `Cut front + lapel — ${len(j.front)} cm outline`, true),
-    cutStep("back", [j.back], j.backC, `Cut back on the fold — ${len(j.back)} cm`),
-    cutStep("topSleeve", [top], [sx + m.sleeveLength / 2, tw / 2], `Cut top sleeve — ${len(top)} cm outline`, true),
-    cutStep("underSleeve", [under], [sx + m.sleeveLength / 2, tw + G + uw / 2], `Cut under sleeve — ${len(under)} cm outline`, true),
+    fold(L, j.backC, `Fold here · back on the fold, ${r(L)} cm`),
+    measure(c, jacketMarks(m, j, sx, tw), "Check the marks · neck, shoulder, chest, waist, length, sleeve"),
+    cutStep("front", [j.front], j.frontC, `Cut front + lapel · ${len(j.front)} cm outline`, true),
+    cutStep("back", [j.back], j.backC, `Cut back on the fold · ${len(j.back)} cm`),
+    cutStep("topSleeve", [top], [sx + m.sleeveLength / 2, tw / 2], `Cut top sleeve · ${len(top)} cm outline`, true),
+    cutStep("underSleeve", [under], [sx + m.sleeveLength / 2, tw + G + uw / 2], `Cut under sleeve · ${len(under)} cm outline`, true),
   ]
   return finishLayout(steps)
 }
@@ -242,7 +242,7 @@ const BLAZER: StyleRecipe = {
   measurements: jacketDefs().map((d) => (d.key === "jacketLength" ? def("jacketLength", "Blazer length", 70, 55, 85) : d)),
   steps: [...FOLD_MEASURE, step("front", "Front + lapel"), step("back", "Back"), step("topSleeve", "Top sleeve"), step("underSleeve", "Under sleeve")],
   build: buildBlazer,
-  piecesText: () => "Pieces cut: 7 — 2 fronts with lapels, back on the fold, 2 top sleeves + 2 under sleeves",
+  piecesText: () => "Pieces cut: 7 (2 fronts with lapels, back on the fold, 2 top sleeves + 2 under sleeves)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 4),
 }
 
@@ -261,7 +261,7 @@ function buildJoggers(m: Measurements): PatternGeometry {
   const cuff = rect(cx, 0, cuffH, cuffL)
   const c: P2 = [t.right / 2, L / 2]
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold selvedge to selvedge — cut 2 of each leg`),
+    fold(L, c, `Fold selvedge to selvedge · cut 2 of each leg`),
     measure(
       c,
       [
@@ -275,12 +275,12 @@ function buildJoggers(m: Measurements): PatternGeometry {
         {a: [bx + bandW / 2, 0], b: [bx + bandW / 2, bandL], label: `Band ${r(bandL)} cm`},
         {a: [cx, 4], b: [cx + cuffH, 4], label: `Cuff ${m.cuffHeight} cm`},
       ],
-      "Check the marks — waist, hip, rise, length, ankle, band, cuff",
+      "Check the marks · waist, hip, rise, length, ankle, band, cuff",
     ),
-    cutStep("front", [t.front], t.frontC, `Cut front leg — ${len(t.front)} cm outline`, true),
-    cutStep("back", [t.back], t.backC, `Cut back leg — ${len(t.back)} cm outline`, true),
-    cutStep("waistband", [band], [bx + bandW / 2, bandL / 2], `Cut elastic waistband — ${r(bandL)} × ${r(bandW)} cm`, true),
-    cutStep("cuff", [cuff], [cx + cuffH / 2, cuffL / 2], `Cut ankle cuff — ${r(cuffL)} × ${r(cuffH)} cm (cut 2)`, true),
+    cutStep("front", [t.front], t.frontC, `Cut front leg · ${len(t.front)} cm outline`, true),
+    cutStep("back", [t.back], t.backC, `Cut back leg · ${len(t.back)} cm outline`, true),
+    cutStep("waistband", [band], [bx + bandW / 2, bandL / 2], `Cut elastic waistband · ${r(bandL)} × ${r(bandW)} cm`, true),
+    cutStep("cuff", [cuff], [cx + cuffH / 2, cuffL / 2], `Cut ankle cuff · ${r(cuffL)} × ${r(cuffH)} cm (cut 2)`, true),
   ]
   return finishLayout(steps)
 }
@@ -297,7 +297,7 @@ const JOGGERS: StyleRecipe = {
   ],
   steps: [...FOLD_MEASURE, step("front", "Front leg"), step("back", "Back leg"), step("waistband", "Elastic waistband"), step("cuff", "Ankle cuff")],
   build: buildJoggers,
-  piecesText: () => "Pieces cut: 7 — 2 fronts, 2 backs, elastic waistband, 2 ankle cuffs",
+  piecesText: () => "Pieces cut: 7 (2 fronts, 2 backs, elastic waistband, 2 ankle cuffs)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 4),
 }
 
@@ -310,11 +310,11 @@ function buildPalazzo(m: Measurements): PatternGeometry {
   const band = rect(bx, 0, 10, m.waist + 6)
   const c: P2 = [t.right / 2, L / 2]
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold selvedge to selvedge — cut 2 of each leg`),
-    measure(c, trouserMarks(m, t, 0, 0, "Leg hem"), "Check the marks — waist, hip, rise, length, wide hem"),
-    cutStep("front", [t.front], t.frontC, `Cut wide-leg front — ${len(t.front)} cm outline`, true),
-    cutStep("back", [t.back], t.backC, `Cut wide-leg back — ${len(t.back)} cm outline`, true),
-    cutStep("waistband", [band], [bx + 5, (m.waist + 6) / 2], `Cut waistband — ${r(m.waist + 6)} × 10 cm`, true),
+    fold(L, c, `Fold selvedge to selvedge · cut 2 of each leg`),
+    measure(c, trouserMarks(m, t, 0, 0, "Leg hem"), "Check the marks · waist, hip, rise, length, wide hem"),
+    cutStep("front", [t.front], t.frontC, `Cut wide-leg front · ${len(t.front)} cm outline`, true),
+    cutStep("back", [t.back], t.backC, `Cut wide-leg back · ${len(t.back)} cm outline`, true),
+    cutStep("waistband", [band], [bx + 5, (m.waist + 6) / 2], `Cut waistband · ${r(m.waist + 6)} × 10 cm`, true),
   ]
   return finishLayout(steps)
 }
@@ -327,7 +327,7 @@ const PALAZZO: StyleRecipe = {
   measurements: trouserDefs(70, 98, 27, 104, 80, "Leg hem width (round)", 50, 120),
   steps: [...FOLD_MEASURE, step("front", "Front leg"), step("back", "Back leg"), step("waistband", "Waistband")],
   build: buildPalazzo,
-  piecesText: () => "Pieces cut: 5 — 2 wide-leg fronts, 2 wide-leg backs, waistband",
+  piecesText: () => "Pieces cut: 5 (2 wide-leg fronts, 2 wide-leg backs, waistband)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 3),
 }
 
@@ -371,7 +371,7 @@ function buildBubu(m: Measurements): PatternGeometry {
     [0, L],
   ]
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold here — ${r(L)} cm along the fold`),
+    fold(L, c, `Fold here · ${r(L)} cm along the fold`),
     measure(
       c,
       [
@@ -383,13 +383,13 @@ function buildBubu(m: Measurements): PatternGeometry {
         {a: [0, L - 20], b: [hw, L - 20], label: `Hip ${m.hip} cm`},
         {a: [4, 0], b: [4, L], label: `Length ${m.fullLength} cm`},
       ],
-      "Check the marks — neck, shoulder, wide sleeve, bust, hip, length",
+      "Check the marks · neck, shoulder, wide sleeve, bust, hip, length",
     ),
-    cutStep("neckline", [neck], c, `Cut round neck — ${len(neck)} cm curve`),
-    cutStep("shoulderSleeve", [top], c, `Cut shoulder + wide sleeve top — ${len(top)} cm`),
-    cutStep("sleeveEnd", [end], c, `Cut sleeve end — ${len(end)} cm, leave open`),
-    cutStep("sideSeam", [under], c, `Cut batwing underarm + side — ${len(under)} cm`),
-    cutStep("hem", [hem], c, `Cut hem — ${len(hem)} cm at the ankle`),
+    cutStep("neckline", [neck], c, `Cut round neck · ${len(neck)} cm curve`),
+    cutStep("shoulderSleeve", [top], c, `Cut shoulder + wide sleeve top · ${len(top)} cm`),
+    cutStep("sleeveEnd", [end], c, `Cut sleeve end · ${len(end)} cm, leave open`),
+    cutStep("sideSeam", [under], c, `Cut batwing underarm + side · ${len(under)} cm`),
+    cutStep("hem", [hem], c, `Cut hem · ${len(hem)} cm at the ankle`),
   ]
   return finishLayout(steps)
 }
@@ -417,7 +417,7 @@ const BUBU: StyleRecipe = {
     step("hem", "Hem"),
   ],
   build: buildBubu,
-  piecesText: () => "Pieces cut: 2 — front + back on the fold (wide batwing sleeves cut on)",
+  piecesText: () => "Pieces cut: 2 (front + back on the fold (wide batwing sleeves cut on))",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }
 
@@ -501,13 +501,13 @@ function buildALine(m: Measurements): PatternGeometry {
   ]
   const wz = b.ad + 15
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold here — ${r(L)} cm along the fold`),
-    measure(c, [...dressMarks(m, b, wz, L), {a: [hemW - m.hemFlare, L - 6], b: [hemW, L - 6], label: `Flare ${m.hemFlare} cm`}], "Check the marks — neck, shoulder, bust, waist, hip, length, flare"),
-    cutStep("neckline", [b.neck], c, `Cut neckline — ${len(b.neck)} cm curve`),
-    cutStep("shoulder", [b.shoulder], c, `Cut shoulder — ${len(b.shoulder)} cm`),
-    cutStep("armhole", [b.armhole], c, `Cut armhole — ${len(b.armhole)} cm curve`),
-    cutStep("sideSeam", [side], c, `Cut A-line side seam — ${len(side)} cm`),
-    cutStep("hem", [hem], c, `Cut curved hem — ${len(hem)} cm`),
+    fold(L, c, `Fold here · ${r(L)} cm along the fold`),
+    measure(c, [...dressMarks(m, b, wz, L), {a: [hemW - m.hemFlare, L - 6], b: [hemW, L - 6], label: `Flare ${m.hemFlare} cm`}], "Check the marks · neck, shoulder, bust, waist, hip, length, flare"),
+    cutStep("neckline", [b.neck], c, `Cut neckline · ${len(b.neck)} cm curve`),
+    cutStep("shoulder", [b.shoulder], c, `Cut shoulder · ${len(b.shoulder)} cm`),
+    cutStep("armhole", [b.armhole], c, `Cut armhole · ${len(b.armhole)} cm curve`),
+    cutStep("sideSeam", [side], c, `Cut A-line side seam · ${len(side)} cm`),
+    cutStep("hem", [hem], c, `Cut curved hem · ${len(hem)} cm`),
   ]
   return finishLayout(steps)
 }
@@ -520,7 +520,7 @@ const A_LINE: StyleRecipe = {
   measurements: [...dressBase(100), def("hemFlare", "Hem flare (each side)", 12, 4, 30)],
   steps: dressSteps(),
   build: buildALine,
-  piecesText: () => "Pieces cut: 2 — front + back on the fold (sleeveless A-line)",
+  piecesText: () => "Pieces cut: 2 (front + back on the fold (sleeveless A-line))",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 2),
 }
 
@@ -554,14 +554,14 @@ function buildSheath(m: Measurements): PatternGeometry {
     [dx, b.ad + 3],
   ]
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold here — ${r(L)} cm along the fold`),
-    measure(c, [...dressMarks(m, b, wz, L), {a: [b.bq + 3, 0], b: [b.bq + 3, wz], label: `Nape to waist ${m.waistLength} cm`}], "Check the marks — neck, shoulder, bust, waist, hip, length"),
-    cutStep("neckline", [b.neck], c, `Cut neckline — ${len(b.neck)} cm curve`),
-    cutStep("shoulder", [b.shoulder], c, `Cut shoulder — ${len(b.shoulder)} cm`),
-    cutStep("armhole", [b.armhole], c, `Cut armhole — ${len(b.armhole)} cm curve`),
-    markStep("waistDart", [dart], c, `Mark waist dart — ${r(dw)} cm wide, ${r(Math.min(L - 4, wz + 14) - b.ad - 3)} cm long`),
-    cutStep("sideSeam", [side], c, `Cut shaped side seam — ${len(side)} cm`),
-    cutStep("hem", [hem], c, `Cut hem — ${len(hem)} cm straight`),
+    fold(L, c, `Fold here · ${r(L)} cm along the fold`),
+    measure(c, [...dressMarks(m, b, wz, L), {a: [b.bq + 3, 0], b: [b.bq + 3, wz], label: `Nape to waist ${m.waistLength} cm`}], "Check the marks · neck, shoulder, bust, waist, hip, length"),
+    cutStep("neckline", [b.neck], c, `Cut neckline · ${len(b.neck)} cm curve`),
+    cutStep("shoulder", [b.shoulder], c, `Cut shoulder · ${len(b.shoulder)} cm`),
+    cutStep("armhole", [b.armhole], c, `Cut armhole · ${len(b.armhole)} cm curve`),
+    markStep("waistDart", [dart], c, `Mark waist dart · ${r(dw)} cm wide, ${r(Math.min(L - 4, wz + 14) - b.ad - 3)} cm long`),
+    cutStep("sideSeam", [side], c, `Cut shaped side seam · ${len(side)} cm`),
+    cutStep("hem", [hem], c, `Cut hem · ${len(hem)} cm straight`),
   ]
   return finishLayout(steps)
 }
@@ -574,7 +574,7 @@ const SHEATH: StyleRecipe = {
   measurements: [...dressBase(95), def("waistLength", "Nape to waist", 40, 32, 50)],
   steps: dressSteps([step("waistDart", "Waist dart", "mark")]),
   build: buildSheath,
-  piecesText: () => "Pieces cut: 2 — front + back on the fold, with waist darts marked",
+  piecesText: () => "Pieces cut: 2 (front + back on the fold, with waist darts marked)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 2),
 }
 
@@ -605,7 +605,7 @@ function buildWrap(m: Measurements): PatternGeometry {
   const tie = rect(tx, 0, 8, tieL)
   const c: P2 = [hemW / 2, L / 2]
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold here — back on the fold, ${r(L)} cm`),
+    fold(L, c, `Fold here · back on the fold, ${r(L)} cm`),
     measure(
       c,
       [
@@ -613,12 +613,12 @@ function buildWrap(m: Measurements): PatternGeometry {
         {a: [sx, sw / 2], b: [sx + m.sleeveLength, sw / 2], label: `Sleeve ${m.sleeveLength} cm`},
         {a: [tx + 4, 0], b: [tx + 4, tieL], label: `Tie ${r(tieL)} cm`},
       ],
-      "Check the marks — neck, bust, waist, hip, length, sleeve, tie",
+      "Check the marks · neck, bust, waist, hip, length, sleeve, tie",
     ),
-    cutStep("back", [back], c, `Cut back on the fold — ${len(back)} cm`),
-    cutStep("wrapFront", [front], [fx + span / 2, L / 2], `Cut wrap front — ${len(front)} cm outline (cut 2)`, true),
-    cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve — ${len(sleeve)} cm outline`, true),
-    cutStep("tie", [tie], [tx + 4, tieL / 2], `Cut tie belt — ${r(tieL)} × 8 cm (cut 2)`, true),
+    cutStep("back", [back], c, `Cut back on the fold · ${len(back)} cm`),
+    cutStep("wrapFront", [front], [fx + span / 2, L / 2], `Cut wrap front · ${len(front)} cm outline (cut 2)`, true),
+    cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve · ${len(sleeve)} cm outline`, true),
+    cutStep("tie", [tie], [tx + 4, tieL / 2], `Cut tie belt · ${r(tieL)} × 8 cm (cut 2)`, true),
   ]
   return finishLayout(steps)
 }
@@ -636,7 +636,7 @@ const WRAP: StyleRecipe = {
   ],
   steps: [...FOLD_MEASURE, step("back", "Back"), step("wrapFront", "Wrap front"), step("sleeve", "Sleeve"), step("tie", "Tie belt")],
   build: buildWrap,
-  piecesText: () => "Pieces cut: 7 — back on the fold, 2 wrap fronts, 2 sleeves, 2 tie belts",
+  piecesText: () => "Pieces cut: 7 (back on the fold, 2 wrap fronts, 2 sleeves, 2 tie belts)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 4),
 }
 
@@ -670,7 +670,7 @@ function buildMaxi(m: Measurements): PatternGeometry {
   const sc: P2 = pt(rw + SL / 2, theta / 2)
   const total = cz + rw + SL
   const steps: StepGeometry[] = [
-    fold(total, sc, `Fold here — bodice and skirt both on the fold, ${r(total)} cm`),
+    fold(total, sc, `Fold here · bodice and skirt both on the fold, ${r(total)} cm`),
     measure(
       sc,
       [
@@ -681,15 +681,15 @@ function buildMaxi(m: Measurements): PatternGeometry {
         {a: [3, z0], b: [3, z0 + SL], label: `Skirt ${m.skirtLength} cm`},
         {a: pt(rw + SL - 4, 0), b: pt(rw + SL - 4, theta), label: `Hem sweep ${m.hemSweep} cm`},
       ],
-      "Check the bodice marks — neck, bust, waist, bodice length",
+      "Check the bodice marks · neck, bust, waist, bodice length",
     ),
-    cutStep("neckline", [b.neck], bc, `Cut bodice neckline — ${len(b.neck)} cm curve`),
-    cutStep("shoulder", [b.shoulder], bc, `Cut shoulder — ${len(b.shoulder)} cm`),
-    cutStep("armhole", [b.armhole], bc, `Cut armhole — ${len(b.armhole)} cm curve`),
-    cutStep("bodiceSide", [bodiceSide], bc, `Cut bodice side + waist — ${len(bodiceSide)} cm`),
-    cutStep("skirtWaist", [waistLine], sc, `Cut skirt waist curve — ${len(waistLine)} cm`),
-    cutStep("skirtSide", [skirtSide], sc, `Cut flared skirt side — ${len(skirtSide)} cm`),
-    cutStep("skirtHem", [hemLine], sc, `Cut skirt hem — ${len(hemLine)} cm curve`),
+    cutStep("neckline", [b.neck], bc, `Cut bodice neckline · ${len(b.neck)} cm curve`),
+    cutStep("shoulder", [b.shoulder], bc, `Cut shoulder · ${len(b.shoulder)} cm`),
+    cutStep("armhole", [b.armhole], bc, `Cut armhole · ${len(b.armhole)} cm curve`),
+    cutStep("bodiceSide", [bodiceSide], bc, `Cut bodice side + waist · ${len(bodiceSide)} cm`),
+    cutStep("skirtWaist", [waistLine], sc, `Cut skirt waist curve · ${len(waistLine)} cm`),
+    cutStep("skirtSide", [skirtSide], sc, `Cut flared skirt side · ${len(skirtSide)} cm`),
+    cutStep("skirtHem", [hemLine], sc, `Cut skirt hem · ${len(hemLine)} cm curve`),
   ]
   // The full lay runs ~2 m: show the bodice lay, then the skirt lay.
   // Not transposed as a whole: the bodice lay stays upright; splitLay turns only a group too deep for the table.
@@ -721,7 +721,7 @@ const MAXI: StyleRecipe = {
     step("skirtHem", "Skirt hem"),
   ],
   build: buildMaxi,
-  piecesText: () => "Pieces cut: 4 — bodice front + back on the fold, flared skirt front + back on the fold",
+  piecesText: () => "Pieces cut: 4 (bodice front + back on the fold, flared skirt front + back on the fold)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 2),
 }
 

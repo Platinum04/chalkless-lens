@@ -31,7 +31,7 @@ export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
   viewDistance: number = 150
   @input
   @hint("Menu title")
-  title: string = "ChalkLess — choose a garment"
+  title: string = "ChalkLess: choose a garment"
   @input
   @hint("Height of each style button (cm)")
   @widget(new SliderWidget(4, 9, 0.5))
@@ -46,7 +46,7 @@ export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
   iconColor: vec4 = new vec4(0.8, 0.97, 1, 1)
   @input
   @hint("Title on page 2 (global styles)")
-  title2: string = "More styles — global"
+  title2: string = "More styles: global"
   @ui.group_end
 
   private _onBubaChosen = new Event<void>()

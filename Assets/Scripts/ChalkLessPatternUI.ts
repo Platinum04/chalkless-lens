@@ -447,6 +447,9 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     let x0 = side > 0 ? lx - w : side < 0 ? lx : lx - w / 2
     x0 = Math.min(fab.x1 - 1 - w, Math.max(fab.x0 + 1, x0))
     lz = Math.min(fab.z1 - 1 - boxH / 2, Math.max(fab.z0 + 1 + boxH / 2, lz))
+    // Above/below-line labels: slide further into the piece until clear of the other visible lines
+    // (e.g. the Maxi bodice neckline label used to sit on the shoulder line).
+    if (!isFold && !st.closed) lz = this.slideClear(i, x0, w, lz, boxH * 1.6, inZ, fab)
     so.getTransform().setLocalPosition(new vec3(x0, 0.4, lz))
     t.size = textSizeForHeight(h)
     t.horizontalAlignment = side > 0 ? HorizontalAlignment.Right : side < 0 ? HorizontalAlignment.Left : HorizontalAlignment.Center
@@ -455,6 +458,42 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     t.layoutRect = Rect.create(0, w, -boxH / 2, boxH / 2)
     t.text = st.label
     so.enabled = true
+  }
+
+  /** Slide the label box in `dir` (2 cm steps, up to 16 cm) to where it crosses the fewest lines. */
+  private slideClear(i: number, x0: number, w: number, z: number, bh: number, dir: number, fab: {z0: number; z1: number}): number {
+    const g = this.geometry
+    const ag = this.activeGroup()
+    const pts: P2[] = []
+    g.steps.forEach((st, k) => {
+      if (g.groups && (st.group || 0) !== ag) return
+      const gs = this.groupSize(k)
+      for (const l of st.lines)
+        for (let n = 1; n < l.length; n++) {
+          const p = l[n - 1]
+          const q = l[n]
+          const c = Math.max(1, Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 1.5))
+          for (let s = 0; s <= c; s++) pts.push([p[0] + ((q[0] - p[0]) * s) / c - gs[0] / 2, p[1] + ((q[1] - p[1]) * s) / c - gs[1] / 2])
+        }
+    })
+    const hits = (cz: number): number => {
+      let n = 0
+      for (const p of pts) if (p[0] > x0 && p[0] < x0 + w && p[1] > cz - bh / 2 && p[1] < cz + bh / 2) n++
+      return n
+    }
+    // Fewest line crossings wins; each 2 cm of extra slide must save at least 2 crossings.
+    let bestZ = z
+    let best = hits(z)
+    for (let d = 2; d <= 16 && best > 0; d += 2) {
+      const cz = z + dir * d
+      if (cz - bh / 2 < fab.z0 + 1 || cz + bh / 2 > fab.z1 - 1) break
+      const n = hits(cz) + d
+      if (n < best) {
+        best = n
+        bestZ = cz
+      }
+    }
+    return bestZ
   }
 
   /** Fabric top-surface rectangle in this object's local XZ (pattern centre = 0,0). */
@@ -490,6 +529,41 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       }
     }
     return best
+  }
+
+  /**
+   * Obstacles for placing the step card (world XZ, ~1 cm spacing): points of the active step's
+   * lines/marks, points of the other visible steps' lines, and the active label box (x0,z0,x1,z1).
+   */
+  stepObstaclesWorld(): {active: vec2[]; other: vec2[]; label: vec4 | null} {
+    const out = {active: [] as vec2[], other: [] as vec2[], label: null as vec4 | null}
+    const g = this.geometry
+    const i = this.currentStep
+    if (!g || i < 0 || i >= g.steps.length) return out
+    const c = this.patternCenterWorld
+    const ag = this.activeGroup()
+    g.steps.forEach((st, k) => {
+      if (g.groups && (st.group || 0) !== ag) return
+      const gs = this.groupSize(k)
+      const ox = c.x - gs[0] / 2
+      const oz = c.z - gs[1] / 2
+      const dst = k === i ? out.active : out.other
+      const segs: [P2, P2][] = []
+      for (const l of st.lines) for (let n = 1; n < l.length; n++) segs.push([l[n - 1], l[n]])
+      if (k === i) for (const mk of st.marks) segs.push([mk.a, mk.b])
+      for (const [p, q] of segs) {
+        const len = Math.hypot(q[0] - p[0], q[1] - p[1])
+        const n = Math.max(1, Math.ceil(len / (k === i ? 2 : 4)))
+        for (let s = 0; s <= n; s++) dst.push(new vec2(ox + p[0] + ((q[0] - p[0]) * s) / n, oz + p[1] + ((q[1] - p[1]) * s) / n))
+      }
+    })
+    const so = this.activeLabel.getSceneObject()
+    if (so.enabled) {
+      const r = this.activeLabel.layoutRect
+      const p = so.getTransform().getWorldPosition()
+      out.label = new vec4(p.x + r.left, p.z + r.bottom, p.x + r.right, p.z + r.top)
+    }
+    return out
   }
 
   /** World point beside the current line (its midpoint), for placing the step label. */

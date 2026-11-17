@@ -102,14 +102,14 @@ function buildKaftan(m: Measurements, long: boolean): PatternGeometry {
   ]
   if (long) marks.push({a: [sx + SL - 3, (sw - cuff) / 2], b: [sx + SL - 3, (sw + cuff) / 2], label: `Wrist ${m.wrist} cm`})
   const steps: StepGeometry[] = [
-    fold(L, bodyC, `Fold here — ${r(L)} cm along the fold`),
-    measure(bodyC, marks, "Check the marks — neck, chest, hip, length, placket, slit, sleeve"),
-    cutStep("neckline", [neck], bodyC, `Cut neckline — ${len(neck)} cm curve`),
-    cutStep("placket", [placket], bodyC, `Cut neck placket — ${r(m.placket)} cm slit down the fold`),
-    cutStep("shoulder", [shoulder], bodyC, `Cut shoulder — ${len(shoulder)} cm`),
-    cutStep("sleeve", [sleeve], sleeveC, `Cut ${long ? "long" : "short"} sleeve — ${len(sleeve)} cm outline`, true),
-    cutStep("sideSeam", [side], bodyC, `Cut side seam — ${len(side)} cm, slit open last ${r(m.slit)} cm`),
-    cutStep("hem", [hem], bodyC, `Cut hem — ${len(hem)} cm at the ankle`),
+    fold(L, bodyC, `Fold here · ${r(L)} cm along the fold`),
+    measure(bodyC, marks, "Check the marks · neck, chest, hip, length, placket, slit, sleeve"),
+    cutStep("neckline", [neck], bodyC, `Cut neckline · ${len(neck)} cm curve`),
+    cutStep("placket", [placket], bodyC, `Cut neck placket · ${r(m.placket)} cm slit down the fold`),
+    cutStep("shoulder", [shoulder], bodyC, `Cut shoulder · ${len(shoulder)} cm`),
+    cutStep("sleeve", [sleeve], sleeveC, `Cut ${long ? "long" : "short"} sleeve · ${len(sleeve)} cm outline`, true),
+    cutStep("sideSeam", [side], bodyC, `Cut side seam · ${len(side)} cm, slit open last ${r(m.slit)} cm`),
+    cutStep("hem", [hem], bodyC, `Cut hem · ${len(hem)} cm at the ankle`),
   ]
   return finishLayout(steps)
 }
@@ -132,7 +132,7 @@ function kaftan(long: boolean): StyleRecipe {
       {id: "hem", title: "Hem", kind: "cut"},
     ],
     build: (m) => buildKaftan(m, long),
-    piecesText: () => `Pieces cut: 4 — front + back on the fold + 2 ${long ? "long" : "short"} sleeves`,
+    piecesText: () => `Pieces cut: 4 (front + back on the fold + 2 ${long ? "long" : "short"} sleeves)`,
     chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 2),
   }
 }
@@ -177,7 +177,7 @@ function buildAgbada(m: Measurements): PatternGeometry {
   ]
   const ad = m.chest / 5 + 4
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold here — ${r(L)} cm along the fold`),
+    fold(L, c, `Fold here · ${r(L)} cm along the fold`),
     measure(
       c,
       [
@@ -188,14 +188,14 @@ function buildAgbada(m: Measurements): PatternGeometry {
         {a: [W - 5, drop], b: [W - 5, drop + so], label: `Opening ${m.sleeveOpening} cm`},
         {a: [ew + 4, 0], b: [ew + 4, L], label: `Length ${m.fullLength} cm`},
       ],
-      "Check the marks — neck, chest, arm span, opening, length",
+      "Check the marks · neck, chest, arm span, opening, length",
     ),
-    cutStep("neckline", [neck], c, `Cut V neck — ${len(neck)} cm each side of the fold`),
-    markStep("embroidery", [panel], c, `Mark embroidery panel — ${r(ew * 2)} × ${r(eh)} cm`),
-    cutStep("shoulder", [shoulder], c, `Cut shoulder line — ${len(shoulder)} cm out to the wrist`),
-    cutStep("sleeveOpening", [opening], c, `Cut sleeve opening — ${r(so)} cm, leave it open`),
-    cutStep("sideSeam", [side], c, `Cut side seam — ${len(side)} cm`),
-    cutStep("hem", [hem], c, `Cut hem — ${len(hem)} cm at the ankle`),
+    cutStep("neckline", [neck], c, `Cut V neck · ${len(neck)} cm each side of the fold`),
+    markStep("embroidery", [panel], c, `Mark embroidery panel · ${r(ew * 2)} × ${r(eh)} cm`),
+    cutStep("shoulder", [shoulder], c, `Cut shoulder line · ${len(shoulder)} cm out to the wrist`),
+    cutStep("sleeveOpening", [opening], c, `Cut sleeve opening · ${r(so)} cm, leave it open`),
+    cutStep("sideSeam", [side], c, `Cut side seam · ${len(side)} cm`),
+    cutStep("hem", [hem], c, `Cut hem · ${len(hem)} cm at the ankle`),
   ]
   return finishLayout(steps)
 }
@@ -225,7 +225,7 @@ const AGBADA: StyleRecipe = {
     {id: "hem", title: "Hem", kind: "cut"},
   ],
   build: buildAgbada,
-  piecesText: () => "Pieces cut: 2 — front + back, each one wide piece on the fold",
+  piecesText: () => "Pieces cut: 2 (front + back, each one wide piece on the fold)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }
 
@@ -282,7 +282,7 @@ function buildDashiki(m: Measurements): PatternGeometry {
     [0, L],
   ]
   const steps: StepGeometry[] = [
-    fold(L, c, `Fold here — ${r(L)} cm along the fold`),
+    fold(L, c, `Fold here · ${r(L)} cm along the fold`),
     measure(
       c,
       [
@@ -294,14 +294,14 @@ function buildDashiki(m: Measurements): PatternGeometry {
         {a: [0, L - 8], b: [hw, L - 8], label: `Hip ${m.hip} cm`},
         {a: [4, yd], b: [4, L], label: `Length ${m.topLength} cm`},
       ],
-      "Check the marks — neck, shoulder, sleeve, chest, hip, length",
+      "Check the marks · neck, shoulder, sleeve, chest, hip, length",
     ),
-    cutStep("neckline", [neck], c, `Cut V neck — ${len(neck)} cm each side`),
-    markStep("yoke", [yoke], c, `Mark yoke panel — ${r(yx * 2)} × ${r(yd)} cm`),
-    cutStep("shoulderSleeve", [top], c, `Cut shoulder + sleeve top — ${len(top)} cm`),
-    cutStep("sleeveEnd", [end], c, `Cut sleeve end — ${len(end)} cm`),
-    cutStep("sideSeam", [under], c, `Cut underarm + A-line side — ${len(under)} cm`),
-    cutStep("hem", [hem], c, `Cut hem — ${len(hem)} cm straight`),
+    cutStep("neckline", [neck], c, `Cut V neck · ${len(neck)} cm each side`),
+    markStep("yoke", [yoke], c, `Mark yoke panel · ${r(yx * 2)} × ${r(yd)} cm`),
+    cutStep("shoulderSleeve", [top], c, `Cut shoulder + sleeve top · ${len(top)} cm`),
+    cutStep("sleeveEnd", [end], c, `Cut sleeve end · ${len(end)} cm`),
+    cutStep("sideSeam", [under], c, `Cut underarm + A-line side · ${len(under)} cm`),
+    cutStep("hem", [hem], c, `Cut hem · ${len(hem)} cm straight`),
   ]
   return finishLayout(steps)
 }
@@ -331,7 +331,7 @@ const DASHIKI: StyleRecipe = {
     {id: "hem", title: "Hem", kind: "cut"},
   ],
   build: buildDashiki,
-  piecesText: () => "Pieces cut: 2 — front + back on the fold (kimono sleeves cut on)",
+  piecesText: () => "Pieces cut: 2 (front + back on the fold (kimono sleeves cut on))",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }
 
@@ -391,13 +391,13 @@ function buildCorset(m: Measurements): PatternGeometry {
     }
     grains.push({a: [gx, 5], b: [gx, H - 5], label: p.abbr})
     cuts.push(
-      cutStep(p.id, [pts], c, `Cut panel ${i + 1}/6 ${p.abbr} — ${len(pts)} cm`, i > 0),
+      cutStep(p.id, [pts], c, `Cut panel ${i + 1}/6 ${p.abbr} · ${len(pts)} cm`, i > 0),
     )
     x += mw + gap
   })
   const ext = x - gap
   const c: P2 = [ext / 2, H / 2]
-  steps.push(fold(H, [ext / 2, H / 2], `Fold for the CF panel — ${r(H)} cm`))
+  steps.push(fold(H, [ext / 2, H / 2], `Fold for the CF panel · ${r(H)} cm`))
   steps.push(
     measure(
       c,
@@ -410,7 +410,7 @@ function buildCorset(m: Measurements): PatternGeometry {
         {a: [ext + 3, BL], b: [ext + 3, H], label: `W–H ${m.waistToHip}`},
         ...grains,
       ],
-      "Check the marks — bust, waist, hip and the grainline on every panel",
+      "Check the marks · bust, waist, hip and the grainline on every panel",
     ),
   )
   for (const s of cuts) steps.push(s)
@@ -436,7 +436,7 @@ const CORSET: StyleRecipe = {
     ...CORSET_PANELS.map((p) => ({id: p.id, title: p.title, kind: "cut" as const})),
   ],
   build: buildCorset,
-  piecesText: () => "Pieces cut: 11 — CF on the fold + 2 each of side front, side, side back, back, CB",
+  piecesText: () => "Pieces cut: 11 (CF on the fold + 2 each of side front, side, side back, back, CB)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 6),
 }
 
@@ -466,7 +466,7 @@ function buildWrapper(m: Measurements): PatternGeometry {
     [0, L],
   ]
   const steps: StepGeometry[] = [
-    {id: "fold", lines: [[[0, -2], [0, z0 + wbH + 2]]], closed: false, centroid: sc, marks: [], label: `Fold here — ${r(z0 + wbH)} cm along the fold`},
+    {id: "fold", lines: [[[0, -2], [0, z0 + wbH + 2]]], closed: false, centroid: sc, marks: [], label: `Fold here · ${r(z0 + wbH)} cm along the fold`},
     measure(
       sc,
       [
@@ -475,11 +475,11 @@ function buildWrapper(m: Measurements): PatternGeometry {
         {a: [0, z0 + wbH / 2], b: [wbL - 6, z0 + wbH / 2], label: `Waist ${m.waist} cm`},
         {a: [wbL - 3, z0], b: [wbL - 3, z0 + wbH], label: `Band ${m.waistband} cm`},
       ],
-      "Check the marks — hip wrap, length, waist, band",
+      "Check the marks · hip wrap, length, waist, band",
     ),
-    cutStep("waistband", [band], bc, `Cut waistband — ${r(wbL * 2)} × ${r(wbH)} cm on the fold`),
-    cutStep("sideEdges", [sides], sc, `Cut waist edge + side edge — ${len(sides)} cm`),
-    cutStep("hem", [hem], sc, `Cut hem — ${len(hem)} cm straight`),
+    cutStep("waistband", [band], bc, `Cut waistband · ${r(wbL * 2)} × ${r(wbH)} cm on the fold`),
+    cutStep("sideEdges", [sides], sc, `Cut waist edge + side edge · ${len(sides)} cm`),
+    cutStep("hem", [hem], sc, `Cut hem · ${len(hem)} cm straight`),
   ]
   return finishLayout(steps)
 }
@@ -503,7 +503,7 @@ const WRAPPER: StyleRecipe = {
     {id: "hem", title: "Hem", kind: "cut"},
   ],
   build: buildWrapper,
-  piecesText: () => "Pieces cut: 2 — wrapper on the fold + waistband",
+  piecesText: () => "Pieces cut: 2 (wrapper on the fold + waistband)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }
 

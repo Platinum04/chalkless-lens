@@ -79,6 +79,13 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
     return this.label ? this.label.text : ""
   }
 
+  /** Card footprint in its local plane incl. the progress dots: (xMin, yMin, xMax, yMax) cm. */
+  get footprint(): vec4 {
+    const hw = this.plateSize.x / 2
+    const hh = this.plateSize.y / 2
+    return new vec4(-hw, -hh, hw + (this.dotState.total > 0 ? 2.4 + DOT_R * 2 + 0.6 : 0), hh)
+  }
+
   onAwake(): void {
     this.sceneObject.createComponent("Component.Canvas")
     const plate = this.sceneObject.createComponent(BackPlate.getTypeName()) as BackPlate
@@ -188,7 +195,7 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
     this.mode = "step"
     this.sceneObject.enabled = true
     this.summaryCard.enabled = false
-    const cut = label.indexOf(" — ")
+    const cut = label.indexOf(" · ")
     const head = cut > 0 ? label.substring(0, cut) : label
     const detail = cut > 0 ? label.substring(cut + 3) : title
     this.label.text = head || title

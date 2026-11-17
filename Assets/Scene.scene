@@ -250,7 +250,6 @@
   ScriptInputsDefault:
     panelWidth: true
     viewDistance: true
-    title: true
     buttonHeight: true
     titleColor: true
     iconColor: true
@@ -260,11 +259,11 @@
     "":
       panelWidth: !<float> 32.000000
       viewDistance: !<float> 150.000000
-      title: ChalkLess — choose a garment
+      title: "ChalkLess: choose a garment"
       buttonHeight: 5.500000
       titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
       iconColor: !<Vec4> {x: 0.800000, y: 0.970000, z: 1.000000, w: 1.000000}
-      title2: More styles — global
+      title2: "More styles: global"
   ScriptTypes:
     "":
       {}
