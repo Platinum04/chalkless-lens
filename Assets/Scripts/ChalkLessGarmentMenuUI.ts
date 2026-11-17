@@ -39,6 +39,7 @@ export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
   onAwake(): void {
     this.sceneObject.createComponent("Component.Canvas")
     const plate = this.sceneObject.createComponent(BackPlate.getTypeName()) as BackPlate
+    plate.style = "simple"
     const W = this.panelWidth
     const btnW = W - 4
     const content = child(this.sceneObject, "Content", new vec3(0, 0, CONTENT_Z))

@@ -54,6 +54,7 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
   onAwake(): void {
     this.sceneObject.createComponent("Component.Canvas")
     const plate = this.sceneObject.createComponent(BackPlate.getTypeName()) as BackPlate
+    plate.style = "simple"
     const W = this.panelWidth
     const inner = W - 4
     const d = this.viewDistance
@@ -62,7 +63,7 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
     flex.onLayoutComplete.add((r) => {
       plate.size = new vec2(r.containerWidth, r.containerHeight)
     })
-    this.counter = textRow(content, "StepCounter", "Align pattern", "Headline2", d, inner, 3, new vec4(0.8, 0.85, 0.9, 1))
+    this.counter = textRow(content, "StepCounter", "Align pattern", "Headline1", d, inner, 3.5, new vec4(0.8, 0.85, 0.9, 1))
     this.label = textRow(content, "StepLabel", this.alignText, "Title2", d, inner, 10, this.labelColor)
     this.action = labeledButton(content, "StepActionButton", "Start cutting", inner, 8, d, "Title2")
     this.action.button.onTriggerUp.add(() => this.pressAction())

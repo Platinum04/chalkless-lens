@@ -79,6 +79,12 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
   private draggable = false
   private currentStep = -1
   private states: LineState[] = []
+  private activeLabel: Text
+
+  /** Text of the label lying beside the glowing line ("" when none). */
+  get activeLabelText(): string {
+    return this.activeLabel && this.activeLabel.getSceneObject().enabled ? this.activeLabel.text : ""
+  }
 
   /** Per-step line state, e.g. ["done","active","future",...] (for tests). */
   get lineStates(): LineState[] {
@@ -101,10 +107,22 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       done: c(this.doneColor),
       future: c(this.futureColor),
       align: c(this.alignColor),
-      glow: c(new vec4(this.activeColor.x * 0.4, this.activeColor.y * 0.4, this.activeColor.z * 0.4, 1)),
+      glow: c(new vec4(0.5 + this.activeColor.x * 0.5, 0.5 + this.activeColor.y * 0.5, 0.5 + this.activeColor.z * 0.5, 1)),
     }
     this.content = global.scene.createSceneObject("PatternContent")
     this.content.setParent(this.sceneObject)
+    const lo = global.scene.createSceneObject("ActiveLineLabel")
+    lo.setParent(this.sceneObject)
+    lo.getTransform().setLocalRotation(quat.fromEulerAngles(-Math.PI / 2, 0, 0))
+    this.activeLabel = lo.createComponent("Component.Text") as Text
+    this.activeLabel.depthTest = true
+    applyTextRole(this.activeLabel, "Title2", 300)
+    this.activeLabel.textFill.color = this.activeColor
+    this.activeLabel.horizontalAlignment = HorizontalAlignment.Center
+    this.activeLabel.verticalAlignment = VerticalAlignment.Center
+    this.activeLabel.horizontalOverflow = HorizontalOverflow.Overflow
+    this.activeLabel.layoutRect = Rect.create(-20, 20, -2, 2)
+    lo.enabled = false
 
     this.collider = this.sceneObject.createComponent("Physics.ColliderComponent") as ColliderComponent
     this.collider.fitVisual = false
@@ -216,18 +234,18 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     so.setParent(parent)
     const vertical = Math.abs(b[1] - a[1]) > Math.abs(b[0] - a[0])
     const mx = (a[0] + b[0]) / 2 + (vertical ? 1.5 : 0)
-    const mz = (a[1] + b[1]) / 2 + (vertical ? 0 : 1.8)
+    const mz = (a[1] + b[1]) / 2 + (vertical ? 0 : 2.6)
     so.getTransform().setLocalPosition(new vec3(mx, 0.3, mz))
     so.getTransform().setLocalRotation(quat.fromEulerAngles(-Math.PI / 2, 0, 0))
     const t = so.createComponent("Component.Text") as Text
     t.text = label
     t.depthTest = true
-    applyTextRole(t, "Headline1", 150)
+    applyTextRole(t, "Headline1", 330)
     t.textFill.color = this.activeColor
     t.horizontalAlignment = vertical ? HorizontalAlignment.Left : HorizontalAlignment.Center
     t.verticalAlignment = VerticalAlignment.Center
     t.horizontalOverflow = HorizontalOverflow.Overflow
-    t.layoutRect = Rect.create(vertical ? 0 : -10, vertical ? 20 : 10, -1.2, 1.2)
+    t.layoutRect = Rect.create(vertical ? 0 : -16, vertical ? 30 : 16, -1.6, 1.6)
   }
 
   /** -1 = aligning (whole outline shown); 0..6 = cutting; 7 = all done. */
@@ -253,6 +271,47 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       v.arrows.sceneObject.enabled = s === "active"
       v.labels.enabled = s === "active"
     })
+    this.placeActiveLabel()
+  }
+
+  private placeActiveLabel(): void {
+    const g = this.geometry
+    const so = this.activeLabel.getSceneObject()
+    const i = this.currentStep
+    if (!g || i < 0 || i >= g.steps.length || g.steps[i].lines.length === 0) {
+      so.enabled = false
+      return
+    }
+    const st = g.steps[i]
+    const pts = st.lines[0]
+    const mid: P2 =
+      pts.length === 2 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[Math.floor(pts.length / 2)]
+    let dx = mid[0] - st.centroid[0]
+    let dz = mid[1] - st.centroid[1]
+    const l = Math.sqrt(dx * dx + dz * dz) || 1
+    const off = -8 // inward: the free fabric inside the piece, right beside the line
+    let lx = mid[0] + (dx / l) * off - g.widthCm / 2
+    let lz = mid[1] + (dz / l) * off - g.lengthCm / 2
+    if (i === 0) {
+      // fold: lay the label inside the front piece, beside the fold line
+      lx = 3 - g.widthCm / 2
+      lz = mid[1] - g.lengthCm / 2
+    }
+    so.getTransform().setLocalPosition(new vec3(lx, 0.4, lz))
+    const t = this.activeLabel
+    const side = i === 0 ? -1 : Math.abs(dx / l) > 0.5 ? Math.sign(dx) : 0
+    if (side > 0) {
+      t.horizontalAlignment = HorizontalAlignment.Right
+      t.layoutRect = Rect.create(-45, 0, -2, 2)
+    } else if (side < 0) {
+      t.horizontalAlignment = HorizontalAlignment.Left
+      t.layoutRect = Rect.create(0, 45, -2, 2)
+    } else {
+      t.horizontalAlignment = HorizontalAlignment.Center
+      t.layoutRect = Rect.create(-22, 22, -2, 2)
+    }
+    t.text = st.label
+    so.enabled = true
   }
 
   /** World point beside the current line (its midpoint), for placing the step label. */

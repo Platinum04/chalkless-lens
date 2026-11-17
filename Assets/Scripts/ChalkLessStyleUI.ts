@@ -29,6 +29,8 @@ export function applyTextRole(t: Text, role: TextRole, distanceCm: number = 110)
 }
 
 export const CONTENT_Z = 0.6
+/** UIKit System 3.0 button style. "Primary" gradient renders only partly in the 5.25 preview, so use a flat style. */
+export const BUTTON_STYLE = "Prism"
 export const BUTTON_LABEL_Z = 0.08
 
 export function child(parent: SceneObject, name: string, pos?: vec3): SceneObject {
@@ -90,9 +92,19 @@ export interface LabeledButton {
 }
 
 /** UIKit Button with a raw Text label lifted off its face; registered as a flex child. */
-export function labeledButton(parent: SceneObject, name: string, label: string, w: number, h: number, dist: number, role: TextRole = "Headline1"): LabeledButton {
+export function labeledButton(
+  parent: SceneObject,
+  name: string,
+  label: string,
+  w: number,
+  h: number,
+  dist: number,
+  role: TextRole = "Headline1",
+  style: string = BUTTON_STYLE,
+): LabeledButton {
   const so = child(parent, name)
   const button = so.createComponent(Button.getTypeName()) as Button
+  button.setTheme("Inherited", style)
   button.size = new vec3(w, h, 1)
   flexItem(so, w, h)
   const lo = child(so, name + "Label", new vec3(0, 0, BUTTON_LABEL_Z + 0.5))

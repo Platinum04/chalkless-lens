@@ -74,6 +74,7 @@ export class ChalkLessMeasurePadUI extends BaseScriptComponent {
   onAwake(): void {
     this.sceneObject.createComponent("Component.Canvas")
     const plate = this.sceneObject.createComponent(BackPlate.getTypeName()) as BackPlate
+    plate.style = "simple"
     const W = this.panelWidth
     const inner = W - 4
     const d = this.viewDistance
