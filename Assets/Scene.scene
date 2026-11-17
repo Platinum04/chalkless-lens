@@ -1938,12 +1938,13 @@
   ScriptAsset: !<reference> de6c0872-315a-4848-ada8-f24c177c8ee4
   ScriptInputsDefault:
     only: true
+    runOnStart: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       only: ""
-      runOnStart: true
+      runOnStart: false
   ScriptTypes:
     "":
       {}
