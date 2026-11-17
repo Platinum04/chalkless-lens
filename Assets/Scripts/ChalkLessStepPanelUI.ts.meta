@@ -1,0 +1,60 @@
+- !<AssetImportMetadata/ded1826e-df3c-45ce-b920-788a4f916caa>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 809ddf6b-fe4c-422a-9dc4-4c81fa1d8efe
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 809ddf6b-fe4c-422a-9dc4-4c81fa1d8efe
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> ab478f3b-2b55-4211-bdf6-cba72e0425cb
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/ab478f3b-2b55-4211-bdf6-cba72e0425cb>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 6588e694-15e8-4dd4-bb49-a62eb9c3fa3b
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    alignText: false
+    labelColor: false
+    panelWidth: false
+    viewDistance: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - panelWidth: !<float> 44.000000
+      viewDistance: !<float> 150.000000
+      alignText: Pinch and drag the pattern to line the fold up with the fabric edge
+      labelColor: !<Vec4> {x: 0.550000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessStepPanelUI – step label + Next</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float panelWidth = 44 {"hint":"Panel width in cm", "widget":"slider", "min":24, "max":60, "step":1}'
+    - '// @input float viewDistance = 150 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
+    - '// @input string alignText = "Pinch and drag the pattern to line the fold up with the fabric edge" {"hint":"Instruction shown while aligning the pattern"}'
+    - '// @input vec4 labelColor = "{0.55, 1, 1, 1}" {"hint":"Step label colour (match the glowing line)", "widget":"color"}'
+    - '// @ui {"widget":"group_end"}'

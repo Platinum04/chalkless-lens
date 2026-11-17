@@ -1,0 +1,87 @@
+- !<AssetImportMetadata/95ba1a68-0f2a-4a28-b065-27b6d2045b5c>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 78715405-aabd-41ce-9e11-e4ba9ee89cea
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 78715405-aabd-41ce-9e11-e4ba9ee89cea
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> e5622447-f61d-47ef-bcb3-9897be353c21
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/e5622447-f61d-47ef-bcb3-9897be353c21>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 24701493-28c3-43ff-987a-4ddcab17595c
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    chalkMarginCm: false
+    debugJumpToStep: false
+    fabric: false
+    garmentMenu: false
+    measurePad: false
+    pattern: false
+    patternStartOffset: false
+    stepCm: false
+    stepPanel: false
+    stepPanelX: false
+    summary: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - garmentMenu: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      measurePad: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      pattern: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
+      stepPanel: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
+      summary: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
+      fabric: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      stepCm: !<float> 1.000000
+      patternStartOffset: !<Vec2> {x: -18.000000, y: -2.000000}
+      stepPanelX: !<float> 50.000000
+      chalkMarginCm: !<float> 4.000000
+      debugJumpToStep: !<float> -1.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessMain – buba cutting guide</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"References"}'
+    - '// @input AssignableType_1 garmentMenu {"hint":"Garment menu panel"}'
+    - '// @input AssignableType_2 measurePad {"hint":"Measurement pad panel"}'
+    - '// @input AssignableType_3 pattern {"hint":"Pattern on the fabric"}'
+    - '// @input AssignableType_4 stepPanel {"hint":"Step label + Next panel lying on the fabric"}'
+    - '// @input AssignableType_5 summary {"hint":"Summary card at the far edge of the table"}'
+    - '// @input SceneObject fabric {"hint":"Fabric SceneObject (top surface centre)"}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float stepCm = 1 {"hint":"Step size of the − / + buttons (cm)", "widget":"slider", "min":0.5, "max":5, "step":0.5}'
+    - '// @input vec2 patternStartOffset = {-18,-2} {"hint":"Where the pattern centre starts on the fabric, relative to the fabric centre (x, z cm)"}'
+    - '// @input float stepPanelX = 50 {"hint":"Step panel offset from fabric centre along X (cm) — keeps it beside the lines"}'
+    - '// @input float chalkMarginCm = 4 {"hint":"Extra margin a standard chalk layout leaves around the pattern (cm) — for the fabric-saved estimate", "widget":"slider", "min":0, "max":10, "step":0.5}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Debug"}'
+    - '// @input float debugJumpToStep = -1 {"hint":"Jump straight to a cutting step at launch for review (-1 = normal start at the menu, 0..6 = step, 7 = summary)", "widget":"slider", "min":-1, "max":7, "step":1}'
+    - '// @ui {"widget":"group_end"}'

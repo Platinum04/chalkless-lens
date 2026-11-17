@@ -18,3 +18,5 @@ PluginsUserPreferences/
 Thumbs.db
 .DS_Store
 node_modules/
+.virtual-scene*.json
+Packages/AiPreviewAgentInspect.lspkg*

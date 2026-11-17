@@ -1,0 +1,57 @@
+- !<AssetImportMetadata/566bfdef-2802-40cb-a050-cb1e27ed5d06>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> e4d2ff48-6348-4917-bb70-fac1ea19ddf9
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> e4d2ff48-6348-4917-bb70-fac1ea19ddf9
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 755767ba-206a-4387-aca6-e8fcb13aa6b6
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/755767ba-206a-4387-aca6-e8fcb13aa6b6>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 694e06e1-6626-4d63-a934-9c72b1ba6e72
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    headlineColor: false
+    panelWidth: false
+    viewDistance: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - panelWidth: !<float> 36.000000
+      viewDistance: !<float> 150.000000
+      headlineColor: !<Vec4> {x: 0.600000, y: 1.000000, z: 0.700000, w: 1.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessSummaryUI – cut summary card</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float panelWidth = 36 {"hint":"Panel width in cm", "widget":"slider", "min":20, "max":60, "step":1}'
+    - '// @input float viewDistance = 150 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
+    - '// @input vec4 headlineColor = "{0.6, 1, 0.7, 1}" {"hint":"Headline colour", "widget":"color"}'
+    - '// @ui {"widget":"group_end"}'

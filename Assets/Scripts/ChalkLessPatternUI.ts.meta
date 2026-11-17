@@ -1,0 +1,81 @@
+- !<AssetImportMetadata/97e2013f-caa2-4818-9619-ff9120034eee>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 01aa3b3d-09b8-46d3-848c-9754996d76fc
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 01aa3b3d-09b8-46d3-848c-9754996d76fc
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 302d971a-fedd-4b66-b2d1-109fe1fe0085
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/302d971a-fedd-4b66-b2d1-109fe1fe0085>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 0fd2ec6d-dda7-4632-9072-a69041d47235
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    activeColor: false
+    activeLineWidth: false
+    alignColor: false
+    debugColliders: false
+    doneColor: false
+    fabric: false
+    fabricSize: false
+    futureColor: false
+    lineMaterial: false
+    seamAllowanceCm: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - lineMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      fabric: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      fabricSize: !<Vec2> {x: 150.000000, y: 80.000000}
+      seamAllowanceCm: 1.500000
+      activeLineWidth: 0.700000
+      activeColor: !<Vec4> {x: 0.100000, y: 0.950000, z: 1.000000, w: 1.000000}
+      doneColor: !<Vec4> {x: 0.450000, y: 0.450000, z: 0.450000, w: 1.000000}
+      futureColor: !<Vec4> {x: 0.660000, y: 0.640000, z: 0.600000, w: 1.000000}
+      alignColor: !<Vec4> {x: 0.250000, y: 0.550000, z: 1.000000, w: 1.000000}
+      debugColliders: false
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessPatternUI – pattern on the fabric</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"References"}'
+    - '// @input Asset.Material lineMaterial {"hint":"Unlit material cloned for every line colour"}'
+    - '// @input SceneObject fabric {"hint":"Fabric SceneObject — the pattern is kept on its top surface while dragging"}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input vec2 fabricSize = {150,80} {"hint":"Fabric size in cm (width along X, depth along Z)"}'
+    - '// @input float seamAllowanceCm = 1.5 {"hint":"Seam allowance drawn outside each cut line (cm)", "widget":"slider", "min":0.5, "max":3, "step":0.1}'
+    - '// @input float activeLineWidth = 0.7 {"hint":"Width of the glowing current line (cm)", "widget":"slider", "min":0.2, "max":1.5, "step":0.05}'
+    - '// @input vec4 activeColor = "{0.1, 0.95, 1, 1}" {"hint":"Glow colour of the current line", "widget":"color"}'
+    - '// @input vec4 doneColor = "{0.45, 0.45, 0.45, 1}" {"hint":"Colour of finished lines (grey)", "widget":"color"}'
+    - '// @input vec4 futureColor = "{0.66, 0.64, 0.6, 1}" {"hint":"Colour of lines not reached yet (faint, just off the fabric colour)", "widget":"color"}'
+    - '// @input vec4 alignColor = "{0.25, 0.55, 1, 1}" {"hint":"Outline colour while aligning the pattern", "widget":"color"}'
+    - '// @input bool debugColliders {"hint":"Show the drag collider as wireframe"}'
+    - '// @ui {"widget":"group_end"}'

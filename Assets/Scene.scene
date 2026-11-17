@@ -5,6 +5,8 @@
     - !<own> 00000000-0000-0065-0000-000000000064
     - !<own> 0005641c-028d-459a-0000-000000014b4d
     - !<own> f5d74682-203a-4970-81ea-9fa7b88c96bb
+    - !<own> 73c349c3-1859-40bb-abe4-68d97e564c90
+    - !<own> 9fc200e7-80f4-472f-9483-8c5f8ce80919
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       - id: 1
@@ -237,6 +239,28 @@
     []
   Components:
     []
+- !<ScriptComponent/06c1fdfc-99fe-4c9c-9aac-16d1ad0dd759>
+  PrefabRemaps:
+    []
+  Name: ChalkLessGarmentMenuUI
+  Enabled: true
+  ScriptAsset: !<reference> d4e16fc8-1256-4ef0-96ae-4bbe47fcd598
+  ScriptInputsDefault:
+    panelWidth: true
+    viewDistance: true
+    title: true
+    titleColor: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      panelWidth: !<float> 32.000000
+      viewDistance: !<float> 150.000000
+      title: ChalkLess — choose a garment
+      titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/0847d2bb-a13f-4c4a-a404-169f67308f6f>
   PrefabRemaps:
     []
@@ -331,6 +355,26 @@
     []
   Components:
     []
+- !<ScriptComponent/0e0a73ab-83e3-4b14-9b4b-1279d15b5cc2>
+  PrefabRemaps:
+    []
+  Name: ChalkLessSummaryUI
+  Enabled: true
+  ScriptAsset: !<reference> e4d2ff48-6348-4917-bb70-fac1ea19ddf9
+  ScriptInputsDefault:
+    panelWidth: true
+    viewDistance: true
+    headlineColor: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      panelWidth: !<float> 36.000000
+      viewDistance: !<float> 150.000000
+      headlineColor: !<Vec4> {x: 0.600000, y: 1.000000, z: 0.700000, w: 1.000000}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/0e778a10-bd57-4a2a-b20a-b6f4326e8058>
   PrefabRemaps:
     []
@@ -483,6 +527,21 @@
     []
   Components:
     - !<own> e1031f7e-3474-489f-a529-282f7192f812
+- !<SceneObject/224e6f73-5fa1-4e34-800e-25559c60c451>
+  PrefabRemaps:
+    []
+  Name: Pattern
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -18.000000, y: -69.199997, z: -107.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> e0f27c03-4e67-448e-9342-f85368f89a99
 - !<SceneObject/23018601-1041-4785-a20e-9ad5ab722f95>
   PrefabRemaps:
     []
@@ -645,6 +704,21 @@
     - !<own> a7da4af4-3d84-4acd-a31e-920a56b4c5c8
   Components:
     []
+- !<SceneObject/31230379-f9d2-4fc7-b3f9-94dee9ee4761>
+  PrefabRemaps:
+    []
+  Name: StepPanel
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 50.000000, y: -69.000000, z: -105.000000}
+    Rotation: {x: -90.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 4765b014-93b9-4dfb-a66d-9e6edf84e143
 - !<RenderMeshVisual/335c5f8b-2917-49e8-8af5-220696e9bc09>
   PrefabRemaps:
     []
@@ -851,6 +925,28 @@
     - !<own> 8fe2a532-9bf3-4cde-b598-04ce5470718d
   Components:
     []
+- !<ScriptComponent/4765b014-93b9-4dfb-a66d-9e6edf84e143>
+  PrefabRemaps:
+    []
+  Name: ChalkLessStepPanelUI
+  Enabled: true
+  ScriptAsset: !<reference> 809ddf6b-fe4c-422a-9dc4-4c81fa1d8efe
+  ScriptInputsDefault:
+    panelWidth: true
+    viewDistance: true
+    alignText: true
+    labelColor: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      panelWidth: !<float> 44.000000
+      viewDistance: !<float> 150.000000
+      alignText: Pinch and drag the pattern to line the fold up with the fabric edge
+      labelColor: !<Vec4> {x: 0.550000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/4c195c04-c397-454e-bd08-3485f37d84fe>
   PrefabRemaps:
     []
@@ -911,6 +1007,46 @@
     - !<own> 46b79537-a269-46f1-9483-500d7a4170d6
   Components:
     []
+- !<ScriptComponent/54b0f5c8-1c8d-43e8-bcc6-9680fcbaef90>
+  PrefabRemaps:
+    []
+  Name: ChalkLessMeasurePadUI
+  Enabled: true
+  ScriptAsset: !<reference> 5ec02f85-c87e-4756-a736-fe1dca81908b
+  ScriptInputsDefault:
+    panelWidth: true
+    viewDistance: true
+    previewScale: true
+    previewColor: true
+    valueColor: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      lineMaterial: !<reference.Material> 087da98b-5989-484d-b6b2-db071dea8690
+      panelWidth: !<float> 32.000000
+      viewDistance: !<float> 150.000000
+      previewScale: 0.170000
+      previewColor: !<Vec4> {x: 0.400000, y: 0.950000, z: 1.000000, w: 1.000000}
+      valueColor: !<Vec4> {x: 1.000000, y: 0.900000, z: 0.550000, w: 1.000000}
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/57b5016b-d259-42d4-87b9-00493b74c745>
+  PrefabRemaps:
+    []
+  Name: Fabric
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -69.599998, z: -105.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 9ccefa0c-b2a5-4e50-854c-99729cf6324b
 - !<SceneObject/58ef319f-850e-40dd-8295-e6dc36ab4854>
   PrefabRemaps:
     []
@@ -926,6 +1062,29 @@
     - !<own> bf2095b6-c6f8-48c8-b840-e0a6cec0dc99
   Components:
     []
+- !<ScriptComponent/5c00aa8c-d9f4-4c20-abd4-3b59ea781c9b>
+  PrefabRemaps:
+    []
+  Name: ChalkLessWorkTable
+  Enabled: true
+  ScriptAsset: !<reference> c9304f1d-a29a-4c01-b4fa-23ecb374ecc4
+  ScriptInputsDefault:
+    size: true
+    color: true
+    withLegs: true
+    legLength: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      material: !<reference.Material> 087da98b-5989-484d-b6b2-db071dea8690
+      size: !<Vec3> {x: 180.000000, y: 4.000000, z: 90.000000}
+      color: !<Vec4> {x: 0.780000, y: 0.660000, z: 0.500000, w: 1.000000}
+      withLegs: true
+      legLength: !<float> 86.000000
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/5f153ad7-2baa-4fd9-a298-0dcfad86da3b>
   PrefabRemaps:
     []
@@ -950,6 +1109,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/61a8a0c6-6315-4d4f-8a62-94b5dcf5c513>
+  PrefabRemaps:
+    []
+  Name: GarmentMenu
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -46.000000, z: -150.000000}
+    Rotation: {x: -18.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 06c1fdfc-99fe-4c9c-9aac-16d1ad0dd759
 - !<ScriptComponent/62967490-d66e-4479-8829-e5c9da5b5b57>
   PrefabRemaps:
     []
@@ -1116,6 +1290,23 @@
     - !<own> 879ce45b-bd5e-40ff-a3fe-d821523427e4
   Components:
     - !<own> 64f27597-c99d-4c59-8a08-05459cc2258d
+- !<SceneObject/73c349c3-1859-40bb-abe4-68d97e564c90>
+  PrefabRemaps:
+    []
+  Name: ChalkLess
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> d4b1d089-cdfe-4fc1-ae63-8113072ec1ca
+    - !<own> 224e6f73-5fa1-4e34-800e-25559c60c451
+    - !<own> 9d358cd6-5fc2-46fe-bb5e-18ca54433972
+  Components:
+    - !<own> feafb83e-da84-45aa-bebd-da32928164e7
 - !<SceneObject/74d13517-1dbf-42e6-b536-27afc4909c65>
   PrefabRemaps:
     []
@@ -1494,6 +1685,44 @@
   ScriptTypes:
     "":
       {}
+- !<ScriptComponent/9ccefa0c-b2a5-4e50-854c-99729cf6324b>
+  PrefabRemaps:
+    []
+  Name: ChalkLessWorkTable
+  Enabled: true
+  ScriptAsset: !<reference> c9304f1d-a29a-4c01-b4fa-23ecb374ecc4
+  ScriptInputsDefault:
+    legLength: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      material: !<reference.Material> 087da98b-5989-484d-b6b2-db071dea8690
+      size: !<Vec3> {x: 150.000000, y: 0.400000, z: 80.000000}
+      color: !<Vec4> {x: 0.860000, y: 0.840000, z: 0.780000, w: 1.000000}
+      withLegs: false
+      legLength: !<float> 86.000000
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/9d358cd6-5fc2-46fe-bb5e-18ca54433972>
+  PrefabRemaps:
+    []
+  Name: UI
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> 61a8a0c6-6315-4d4f-8a62-94b5dcf5c513
+    - !<own> d0a4a4fe-7dad-4262-aba2-4bf0ea6622a6
+    - !<own> 31230379-f9d2-4fc7-b3f9-94dee9ee4761
+    - !<own> d6b1856e-9649-409e-890b-866140448f55
+  Components:
+    []
 - !<SceneObject/9e373d68-993f-4c8f-83a0-6644f1d9fefd>
   PrefabRemaps:
     []
@@ -1524,6 +1753,21 @@
     - !<own> 46ea93d6-d161-4453-9064-6ac11e1d6523
   Components:
     []
+- !<SceneObject/9fc200e7-80f4-472f-9483-8c5f8ce80919>
+  PrefabRemaps:
+    []
+  Name: AiPreviewAgent Handler
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> ed8cbd02-0538-46be-b2ec-7117eafbab09
 - !<SceneObject/a4b1ce71-4840-4493-bc52-58f3c13933e1>
   PrefabRemaps:
     []
@@ -1986,6 +2230,21 @@
     - !<own> bb9036be-541f-49e7-9554-c297d354da21
   Components:
     []
+- !<SceneObject/d0a4a4fe-7dad-4262-aba2-4bf0ea6622a6>
+  PrefabRemaps:
+    []
+  Name: MeasurementPad
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -44.000000, z: -150.000000}
+    Rotation: {x: -18.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 54b0f5c8-1c8d-43e8-bcc6-9680fcbaef90
 - !<ScriptComponent/d3e2fbc5-8795-4913-9af6-c8626f8e6d9c>
   PrefabRemaps:
     []
@@ -2021,6 +2280,22 @@
     - !<own> 38562bff-09c5-4232-bff1-7ea62a1e7ec5
   Components:
     []
+- !<SceneObject/d4b1d089-cdfe-4fc1-ae63-8113072ec1ca>
+  PrefabRemaps:
+    []
+  Name: PreviewStandIn
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> d86d27c1-0a1f-4606-ae56-4ca4b16e61d5
+    - !<own> 57b5016b-d259-42d4-87b9-00493b74c745
+  Components:
+    []
 - !<SceneObject/d5f63266-b1ce-419f-847b-3c9f347b3ee2>
   PrefabRemaps:
     []
@@ -2036,6 +2311,36 @@
     - !<own> bbcbfc17-8d65-4333-bce1-6f7239f690b8
   Components:
     []
+- !<SceneObject/d6b1856e-9649-409e-890b-866140448f55>
+  PrefabRemaps:
+    []
+  Name: SummaryCard
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -48.000000, z: -150.000000}
+    Rotation: {x: -18.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 0e0a73ab-83e3-4b14-9b4b-1279d15b5cc2
+- !<SceneObject/d86d27c1-0a1f-4606-ae56-4ca4b16e61d5>
+  PrefabRemaps:
+    []
+  Name: CuttingTable
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -70.000000, z: -105.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 5c00aa8c-d9f4-4c20-abd4-3b59ea781c9b
 - !<SceneObject/d9071294-12e8-425f-98f1-bf308a02639e>
   PrefabRemaps:
     []
@@ -2126,6 +2431,38 @@
     - !<own> d4a9c5e3-fe96-4824-9b20-59f5ad39eabd
   Components:
     []
+- !<ScriptComponent/e0f27c03-4e67-448e-9342-f85368f89a99>
+  PrefabRemaps:
+    []
+  Name: ChalkLessPatternUI
+  Enabled: true
+  ScriptAsset: !<reference> 01aa3b3d-09b8-46d3-848c-9754996d76fc
+  ScriptInputsDefault:
+    fabricSize: true
+    seamAllowanceCm: true
+    activeLineWidth: true
+    activeColor: true
+    doneColor: true
+    futureColor: true
+    alignColor: true
+    debugColliders: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      lineMaterial: !<reference.Material> 087da98b-5989-484d-b6b2-db071dea8690
+      fabric: !<reference.SceneObject> 57b5016b-d259-42d4-87b9-00493b74c745
+      fabricSize: !<Vec2> {x: 150.000000, y: 80.000000}
+      seamAllowanceCm: 1.500000
+      activeLineWidth: 0.700000
+      activeColor: !<Vec4> {x: 0.100000, y: 0.950000, z: 1.000000, w: 1.000000}
+      doneColor: !<Vec4> {x: 0.450000, y: 0.450000, z: 0.450000, w: 1.000000}
+      futureColor: !<Vec4> {x: 0.660000, y: 0.640000, z: 0.600000, w: 1.000000}
+      alignColor: !<Vec4> {x: 0.250000, y: 0.550000, z: 1.000000, w: 1.000000}
+      debugColliders: false
+  ScriptTypes:
+    "":
+      {}
 - !<RenderMeshVisual/e1031f7e-3474-489f-a529-282f7192f812>
   PrefabRemaps:
     []
@@ -2254,6 +2591,22 @@
     Fingers_length: 0.000000
     Thumb_inflate: 0.000000
     Thumb_length: 0.000000
+- !<ScriptComponent/ed8cbd02-0538-46be-b2ec-7117eafbab09>
+  PrefabRemaps:
+    []
+  Name: AgentInspectScript
+  Enabled: true
+  ScriptAsset: !<reference> 0b25079c-f5bf-4c6d-96c4-f43b89dfa213
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/f0394c5d-4c44-4c65-a77c-e1c7e05ca905>
   PrefabRemaps:
     []
@@ -2394,3 +2747,33 @@
     - !<own> bb75b5ea-8baf-4d8d-bcf8-49bd79873881
   Components:
     []
+- !<ScriptComponent/feafb83e-da84-45aa-bebd-da32928164e7>
+  PrefabRemaps:
+    []
+  Name: ChalkLessMain
+  Enabled: true
+  ScriptAsset: !<reference> 78715405-aabd-41ce-9e11-e4ba9ee89cea
+  ScriptInputsDefault:
+    stepCm: true
+    patternStartOffset: true
+    stepPanelX: true
+    chalkMarginCm: true
+    debugJumpToStep: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      garmentMenu: !<MappingBased.AssignableType_1> 06c1fdfc-99fe-4c9c-9aac-16d1ad0dd759
+      measurePad: !<MappingBased.AssignableType_2> 54b0f5c8-1c8d-43e8-bcc6-9680fcbaef90
+      pattern: !<MappingBased.AssignableType_3> e0f27c03-4e67-448e-9342-f85368f89a99
+      stepPanel: !<MappingBased.AssignableType_4> 4765b014-93b9-4dfb-a66d-9e6edf84e143
+      summary: !<MappingBased.AssignableType_5> 0e0a73ab-83e3-4b14-9b4b-1279d15b5cc2
+      fabric: !<reference.SceneObject> 57b5016b-d259-42d4-87b9-00493b74c745
+      stepCm: !<float> 1.000000
+      patternStartOffset: !<Vec2> {x: -18.000000, y: -2.000000}
+      stepPanelX: !<float> 50.000000
+      chalkMarginCm: !<float> 4.000000
+      debugJumpToStep: !<float> -1.000000
+  ScriptTypes:
+    "":
+      {}
