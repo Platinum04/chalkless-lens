@@ -373,8 +373,21 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     const st = g.steps[i]
     const gs = this.groupSize(i)
     const pts = st.lines[0]
-    const mid: P2 =
-      pts.length === 2 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[Math.floor(pts.length / 2)]
+    // Anchor at the middle of the line: the midpoint of its longest straight run (L-shaped edges, curves).
+    let mid: P2 = pts[0]
+    let best = -1
+    let runX = 0
+    let runZ = 0
+    for (let k = 1; k < pts.length; k++) {
+      const sl = Math.abs(pts[k][0] - pts[k - 1][0]) + Math.abs(pts[k][1] - pts[k - 1][1])
+      if (sl > best) {
+        best = sl
+        runX = Math.abs(pts[k][0] - pts[k - 1][0])
+        runZ = Math.abs(pts[k][1] - pts[k - 1][1])
+        mid = [(pts[k][0] + pts[k - 1][0]) / 2, (pts[k][1] + pts[k - 1][1]) / 2]
+      }
+    }
+    if (pts.length > 4) mid = pts[Math.floor(pts.length / 2)] // smooth curves: their middle point
     // Inside the piece: closed outlines get the label at the piece centre; open lines get it
     // on the piece side of the line — above/below a horizontal line, beside a vertical one.
     let ex = 0
@@ -382,6 +395,10 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     for (const p of pts) {
       ex = Math.max(ex, Math.abs(p[0] - pts[0][0]))
       ez = Math.max(ez, Math.abs(p[1] - pts[0][1]))
+    }
+    if (pts.length <= 4) {
+      ex = runX
+      ez = runZ
     }
     const inX = st.centroid[0] >= mid[0] ? 1 : -1
     const inZ = st.centroid[1] >= mid[1] ? 1 : -1

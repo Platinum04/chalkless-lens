@@ -265,7 +265,13 @@ function buildJoggers(m: Measurements): PatternGeometry {
     measure(
       c,
       [
-        ...trouserMarks(m, t, 0, 0, "Ankle"),
+        // The leg is cut short by the cuff: keep the length mark on the leg (label keeps the full length).
+        ...trouserMarks(m, t, 0, 0, "Ankle").map((mk): Mark => {
+          const flat = mk.a[1] === mk.b[1]
+          const za = flat ? Math.min(mk.a[1], L - 4) : mk.a[1]
+          const zb = flat ? za : Math.min(mk.b[1], L)
+          return {a: [mk.a[0], za], b: [mk.b[0], zb], label: mk.label}
+        }),
         {a: [bx + bandW / 2, 0], b: [bx + bandW / 2, bandL], label: `Band ${r(bandL)} cm`},
         {a: [cx, 4], b: [cx + cuffH, 4], label: `Cuff ${m.cuffHeight} cm`},
       ],
