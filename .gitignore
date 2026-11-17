@@ -20,3 +20,6 @@ Thumbs.db
 node_modules/
 .virtual-scene*.json
 Packages/AiPreviewAgentInspect.lspkg*
+
+# Added by Lens Studio (LEAF plugin)
+leaf_plugin_settings.json
