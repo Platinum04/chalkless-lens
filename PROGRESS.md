@@ -22,6 +22,8 @@
 - Global styles (2026-11-17): suit, blazer, joggers, palazzo, bubu, A-line, sheath, wrap, maxi gown: Assets/Scripts/ChalkLessGlobalRecipes.ts; menu has 2 pages (MenuNextPageButton / MenuPrevPageButton). 16 styles total.
 - Fixed: Suit asked for waist twice (jacket + trousers); now asked once (caught by LEAF).
 - LEAF: 20 tests (C1–C5 Buba criteria, S1–S6, G1–G9 full style flows): all 20 PASS in Preview 1 and Headless (2026-11-17)
+- UX fixes (2026-11-17): step card next to the active line, readable confirm flash, no em dashes in Lens text. All 20 LEAF tests PASS.
+- Voice "next"/"back": delegated to Codex, brief in devpost/codex-voice-brief.md (Codex owns ChalkLessVoice.ts, Main.previous(), Tests/V1VoiceCommands.ts)
 - UX pass (2026-11-17): step card + progress dots + leader line, ±5 buttons, menu icons, align-stage measurement card, confirm flash. All 20 LEAF tests PASS in both previews afterwards.
 - "Make it solid" done (2026-11-17): labels clamped inside fabric/wrap to 2 lines, mark labels de-overlapped; Suit shows jacket then trousers lay, Maxi bodice then skirt (fabric ≤ ~157x110); brighter teal buttons with hover/pinch states. All 20 LEAF tests PASS in both previews afterwards.
 
