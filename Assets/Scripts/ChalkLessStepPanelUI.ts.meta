@@ -30,6 +30,7 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     alignText: false
+    glowColor: false
     labelColor: false
     panelWidth: false
     viewDistance: false
@@ -46,15 +47,17 @@
       viewDistance: !<float> 150.000000
       alignText: Pinch and drag the pattern to line the fold up with the fabric edge
       labelColor: !<Vec4> {x: 0.550000, y: 1.000000, z: 1.000000, w: 1.000000}
+      glowColor: !<Vec4> {x: 0.100000, y: 0.950000, z: 1.000000, w: 1.000000}
   ScriptTypes:
     -
       {}
   InputLines:
-    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessStepPanelUI – step label + Next</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessStepPanelUI – step card + Next</span>"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
     - '// @input float panelWidth = 44 {"hint":"Panel width in cm", "widget":"slider", "min":24, "max":60, "step":1}'
     - '// @input float viewDistance = 150 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
     - '// @input string alignText = "Pinch and drag the pattern to line the fold up with the fabric edge" {"hint":"Instruction shown while aligning the pattern"}'
-    - '// @input vec4 labelColor = "{0.55, 1, 1, 1}" {"hint":"Step label colour (match the glowing line)", "widget":"color"}'
+    - '// @input vec4 labelColor = "{0.55, 1, 1, 1}" {"hint":"Step title colour (match the glowing line)", "widget":"color"}'
+    - '// @input vec4 glowColor = "{0.1, 0.95, 1, 1}" {"hint":"Leader line + current progress dot colour", "widget":"color"}'
     - '// @ui {"widget":"group_end"}'

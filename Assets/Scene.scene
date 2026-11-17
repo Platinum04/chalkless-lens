@@ -253,6 +253,7 @@
     title: true
     buttonHeight: true
     titleColor: true
+    iconColor: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -262,6 +263,7 @@
       title: ChalkLess — choose a garment
       buttonHeight: 5.500000
       titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
+      iconColor: !<Vec4> {x: 0.800000, y: 0.970000, z: 1.000000, w: 1.000000}
       title2: More styles — global
   ScriptTypes:
     "":
@@ -957,6 +959,7 @@
     viewDistance: true
     alignText: true
     labelColor: true
+    glowColor: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -965,6 +968,7 @@
       viewDistance: !<float> 150.000000
       alignText: Pinch and drag the pattern to line the fold up with the fabric edge
       labelColor: !<Vec4> {x: 0.550000, y: 1.000000, z: 1.000000, w: 1.000000}
+      glowColor: !<Vec4> {x: 0.100000, y: 0.950000, z: 1.000000, w: 1.000000}
   ScriptTypes:
     "":
       {}
@@ -1035,7 +1039,6 @@
   Enabled: true
   ScriptAsset: !<reference> 5ec02f85-c87e-4756-a736-fe1dca81908b
   ScriptInputsDefault:
-    panelWidth: true
     viewDistance: true
     previewScale: true
     previewColor: true
@@ -1045,7 +1048,7 @@
   ScriptInputs:
     "":
       lineMaterial: !<reference.Material> 087da98b-5989-484d-b6b2-db071dea8690
-      panelWidth: !<float> 32.000000
+      panelWidth: !<float> 44.000000
       viewDistance: !<float> 150.000000
       previewScale: 0.170000
       previewColor: !<Vec4> {x: 0.400000, y: 0.950000, z: 1.000000, w: 1.000000}
@@ -2841,6 +2844,8 @@
   ScriptAsset: !<reference> 78715405-aabd-41ce-9e11-e4ba9ee89cea
   ScriptInputsDefault:
     stepCm: true
+    bigStepCm: true
+    summaryMeasureCount: true
     patternStartOffset: true
     stepPanelX: true
     chalkMarginCm: true
@@ -2857,6 +2862,8 @@
       summary: !<MappingBased.AssignableType_5> 0e0a73ab-83e3-4b14-9b4b-1279d15b5cc2
       fabric: !<reference.SceneObject> 57b5016b-d259-42d4-87b9-00493b74c745
       stepCm: !<float> 1.000000
+      bigStepCm: !<float> 5.000000
+      summaryMeasureCount: !<float> 4.000000
       patternStartOffset: !<Vec2> {x: -18.000000, y: -2.000000}
       stepPanelX: !<float> 50.000000
       chalkMarginCm: !<float> 4.000000

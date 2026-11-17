@@ -43,11 +43,15 @@ const FACE_BORDER = new vec4(0.55, 0.9, 1, 1)
 const FACE_FILL = new vec4(0.13, 0.3, 0.38, 1)
 const FACE_HOVER = new vec4(0.25, 0.52, 0.64, 1)
 const FACE_PRESS = new vec4(0.4, 0.72, 0.85, 1)
+const FACE_CONFIRM = new vec4(0.55, 0.95, 1, 1)
+/** Confirm flash length (s) — quiet motion, under 200 ms. */
+const CONFIRM_S = 0.18
 const FACE_Z = 0.55
 const BORDER_CM = 0.35
 const LABEL_SCALE = 1.2
-let faceMats: {border: Material; fill: Material; hover: Material; press: Material} | null = null
-function buttonFaceMaterials(): {border: Material; fill: Material; hover: Material; press: Material} {
+type FaceMats = {border: Material; fill: Material; hover: Material; press: Material; confirm: Material}
+let faceMats: FaceMats | null = null
+function buttonFaceMaterials(): FaceMats {
   if (!faceMats) {
     const base = requireAsset("../ChalkLessUnlit.mat") as Material
     faceMats = {
@@ -55,6 +59,7 @@ function buttonFaceMaterials(): {border: Material; fill: Material; hover: Materi
       fill: tintedMaterial(base, FACE_FILL),
       hover: tintedMaterial(base, FACE_HOVER),
       press: tintedMaterial(base, FACE_PRESS),
+      confirm: tintedMaterial(base, FACE_CONFIRM),
     }
   }
   return faceMats
@@ -128,6 +133,7 @@ export function labeledButton(
   dist: number,
   role: TextRole = "Headline1",
   style: string = BUTTON_STYLE,
+  pill: boolean = false,
 ): LabeledButton {
   const so = child(parent, name)
   const button = so.createComponent(Button.getTypeName()) as Button
@@ -136,19 +142,76 @@ export function labeledButton(
   flexItem(so, w, h)
   const mats = buttonFaceMaterials()
   const face = child(so, name + "Face", new vec3(0, 0, FACE_Z))
-  meshObject(face, "Border", boxMesh(vec3.zero(), new vec3(w, h, 0.05)), mats.border)
-  const fill = meshObject(face, "Fill", boxMesh(new vec3(0, 0, 0.06), new vec3(w - BORDER_CM * 2, h - BORDER_CM * 2, 0.05)), mats.fill)
-  const setFill = (m: Material): void => {
-    fill.mainMaterial = m
-  }
-  button.onHoverEnter.add(() => setFill(mats.hover))
-  button.onHoverExit.add(() => setFill(mats.fill))
-  button.onTriggerDown.add(() => setFill(mats.press))
-  button.onTriggerUp.add(() => setFill(mats.hover))
-  button.onTriggerCanceled.add(() => setFill(mats.fill))
+  const shape = (cw: number, ch: number, z: number): RenderMesh => (pill ? capsuleMesh(cw, ch, z) : boxMesh(new vec3(0, 0, z), new vec3(cw, ch, 0.05)))
+  meshObject(face, "Border", shape(w, h, 0), mats.border)
+  const fill = meshObject(face, "Fill", shape(w - BORDER_CM * 2, h - BORDER_CM * 2, 0.06), mats.fill)
   const lo = child(so, name + "Label", new vec3(0, 0, FACE_Z + 0.2))
   const t = makeText(lo, label, role, dist, w - 1.8, h, new vec4(1, 1, 1, 1))
   t.size = t.size * LABEL_SCALE
   t.horizontalOverflow = HorizontalOverflow.Shrink
+  // States: rest (fill) / hover (lighter) / pressed / confirmed (bright flash + ✓ for < 200 ms).
+  const check = child(so, name + "Check", new vec3(w / 2 - Math.min(h, w / 4) / 2 - 0.4, 0, FACE_Z + 0.3))
+  const ct = makeText(check, "✓", role, dist, Math.min(h, w / 4), h, new vec4(1, 1, 1, 1))
+  ct.size = t.size
+  check.enabled = false
+  let hovered = false
+  let confirming = false
+  const rest = (): void => {
+    fill.mainMaterial = hovered ? mats.hover : mats.fill
+  }
+  const flash = button.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
+  flash.bind(() => {
+    confirming = false
+    check.enabled = false
+    rest()
+  })
+  button.onHoverEnter.add(() => {
+    hovered = true
+    if (!confirming) rest()
+  })
+  button.onHoverExit.add(() => {
+    hovered = false
+    if (!confirming) rest()
+  })
+  button.onTriggerDown.add(() => {
+    fill.mainMaterial = mats.press
+  })
+  button.onTriggerUp.add(() => {
+    confirming = true
+    fill.mainMaterial = mats.confirm
+    check.enabled = true
+    flash.reset(CONFIRM_S)
+  })
+  button.onTriggerCanceled.add(() => rest())
   return {so, button, label: t}
+}
+
+/** Flat capsule (pill) in the XY plane at depth z, facing +Z. */
+export function capsuleMesh(w: number, h: number, z: number): RenderMesh {
+  const mb = new MeshBuilder([
+    {name: "position", components: 3},
+    {name: "normal", components: 3},
+  ])
+  mb.topology = MeshTopology.Triangles
+  mb.indexType = MeshIndexType.UInt16
+  const r = Math.min(h, w) / 2
+  const cx = w / 2 - r
+  const pts: number[][] = []
+  const n = 12
+  for (let i = 0; i <= n; i++) {
+    const a = -Math.PI / 2 + (i / n) * Math.PI
+    pts.push([cx + Math.cos(a) * r, Math.sin(a) * r])
+  }
+  for (let i = 0; i <= n; i++) {
+    const a = Math.PI / 2 + (i / n) * Math.PI
+    pts.push([-cx + Math.cos(a) * r, Math.sin(a) * r])
+  }
+  const v: number[] = [0, 0, z, 0, 0, 1]
+  for (const p of pts) v.push(p[0], p[1], z, 0, 0, 1)
+  const id: number[] = []
+  for (let i = 1; i <= pts.length; i++) id.push(0, i, (i % pts.length) + 1)
+  mb.appendVerticesInterleaved(v)
+  mb.appendIndices(id)
+  mb.updateMesh()
+  return mb.getMesh()
 }

@@ -466,6 +466,32 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     return {x0: cx - this.fabricSize.x / 2, x1: cx + this.fabricSize.x / 2, z0: cz - this.fabricSize.y / 2, z1: cz + this.fabricSize.y / 2}
   }
 
+  /** World point on the current line closest to `from` (leader-line target); null when no line. */
+  currentLineNearestWorld(from: vec3): vec3 | null {
+    const g = this.geometry
+    const i = this.currentStep
+    if (!g || i < 0 || i >= g.steps.length) return null
+    const st = g.steps[i]
+    const c = this.patternCenterWorld
+    const gs = this.groupSize(i)
+    const ox = c.x - gs[0] / 2
+    const oz = c.z - gs[1] / 2
+    const pts: P2[] = []
+    for (const l of st.lines) for (const p of l) pts.push(p)
+    if (st.lines.length === 0) for (const mk of st.marks) pts.push(mk.a, mk.b)
+    let best: vec3 | null = null
+    let bd = 1e12
+    for (const p of pts) {
+      const w = new vec3(ox + p[0], c.y + 0.3, oz + p[1])
+      const d = (w.x - from.x) ** 2 + (w.z - from.z) ** 2
+      if (d < bd) {
+        bd = d
+        best = w
+      }
+    }
+    return best
+  }
+
   /** World point beside the current line (its midpoint), for placing the step label. */
   currentLineAnchorWorld(): vec3 {
     const g = this.geometry

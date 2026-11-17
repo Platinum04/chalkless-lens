@@ -29,6 +29,7 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    bigStepCm: false
     chalkMarginCm: false
     debugJumpToStep: false
     debugStyleId: false
@@ -41,6 +42,7 @@
     stepPanel: false
     stepPanelX: false
     summary: false
+    summaryMeasureCount: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -57,6 +59,8 @@
       summary: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
       fabric: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       stepCm: !<float> 1.000000
+      bigStepCm: !<float> 5.000000
+      summaryMeasureCount: !<float> 4.000000
       patternStartOffset: !<Vec2> {x: -18.000000, y: -2.000000}
       stepPanelX: !<float> 50.000000
       chalkMarginCm: !<float> 4.000000
@@ -79,6 +83,8 @@
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
     - '// @input float stepCm = 1 {"hint":"Step size of the − / + buttons (cm)", "widget":"slider", "min":0.5, "max":5, "step":0.5}'
+    - '// @input float bigStepCm = 5 {"hint":"Step size of the big −5 / +5 buttons (cm)", "widget":"slider", "min":2, "max":10, "step":1}'
+    - '// @input float summaryMeasureCount = 4 {"hint":"How many key measurements the align-stage summary card lists", "widget":"slider", "min":2, "max":6, "step":1}'
     - '// @input vec2 patternStartOffset = {-18,-2} {"hint":"Where the pattern centre starts on the fabric, relative to the fabric centre (x, z cm)"}'
     - '// @input float stepPanelX = 50 {"hint":"Step panel offset from fabric centre along X (cm) — keeps it beside the lines"}'
     - '// @input float chalkMarginCm = 4 {"hint":"Extra margin a standard chalk layout leaves around the pattern (cm) — for the fabric-saved estimate", "widget":"slider", "min":0, "max":10, "step":0.5}'

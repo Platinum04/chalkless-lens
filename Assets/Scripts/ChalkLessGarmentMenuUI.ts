@@ -13,7 +13,9 @@ import {BackPlate} from "UIKit.lspkg/Scripts/BackPlate"
 import {FlexDirection} from "UIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import {child, CONTENT_Z, flexContainer, flexItem, labeledButton, textRow} from "./ChalkLessStyleUI"
 import {PAGE1_STYLES, PAGE2_STYLES} from "./ChalkLessStyleRecipes"
-import {StyleRecipe} from "./ChalkLessPattern"
+import {P2, StyleRecipe} from "./ChalkLessPattern"
+import {garmentIcon} from "./ChalkLessGarmentIcons"
+import {MeshAccumulator, tintedMaterial} from "./ChalkLessLines"
 @component
 export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
   @ui.label('<span style="color: #60A5FA;">ChalkLessGarmentMenuUI – garment picker</span>')
@@ -38,6 +40,10 @@ export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
   @hint("Title text colour (keep light — additive display)")
   @widget(new ColorWidget())
   titleColor: vec4 = new vec4(0.85, 0.95, 1, 1)
+  @input("vec4", "{0.8, 0.97, 1, 1}")
+  @hint("Line-art garment icon colour on each style button (keep light)")
+  @widget(new ColorWidget())
+  iconColor: vec4 = new vec4(0.8, 0.97, 1, 1)
   @input
   @hint("Title on page 2 (global styles)")
   title2: string = "More styles — global"
@@ -84,7 +90,7 @@ export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
       if (this.page === idx) this.plate.size = this.pageSizes[idx]
     })
     textRow(content, idx === 0 ? "MenuTitle" : `MenuTitlePage${idx + 1}`, title, "Headline1", d, inner, 4, this.titleColor)
-    const cells: {name: string; label: string; act: () => void}[] = styles.map((st) => ({name: st.buttonName, label: st.menuLabel, act: () => this.chooseStyle(st.id)}))
+    const cells: {name: string; label: string; act: () => void; rec?: StyleRecipe}[] = styles.map((st) => ({name: st.buttonName, label: st.menuLabel, act: () => this.chooseStyle(st.id), rec: st}))
     cells.push({name: navName, label: navLabel, act: onNav})
     for (let i = 0; i < cells.length; i += 2) {
       const row = child(content, idx === 0 ? `StyleRow${i / 2}` : `Page${idx + 1}Row${i / 2}`)
@@ -93,9 +99,39 @@ export class ChalkLessGarmentMenuUI extends BaseScriptComponent {
       for (const c of cells.slice(i, i + 2)) {
         const b = labeledButton(row, c.name, c.label, btnW, h, d, "Subheadline")
         b.button.onTriggerUp.add(c.act)
+        if (c.rec) this.addIcon(b.so, b.label, c.rec, btnW, h)
       }
     }
   }
+
+  /** Light line-art garment icon on the button's left (ChalkLessGarmentIcons). */
+  private addIcon(btn: SceneObject, label: Text, rec: StyleRecipe, w: number, h: number): void {
+    if (!this.iconMat) this.iconMat = tintedMaterial(requireAsset("../ChalkLessUnlit.mat") as Material, this.iconColor)
+    const box = h - 1.4
+    const acc = new MeshAccumulator(0)
+    for (const l of garmentIcon(rec.id)) acc.polyline(l.map((p) => [p[0] * box, p[1] * box] as P2), 0.22)
+    const iconX = -w / 2 + 0.8 + box / 2
+    const so = global.scene.createSceneObject(btn.name + "Icon")
+    so.setParent(btn)
+    so.getTransform().setLocalPosition(new vec3(iconX, 0, 0.85))
+    so.getTransform().setLocalRotation(quat.fromEulerAngles(Math.PI / 2, 0, 0))
+    const r = so.createComponent("Component.RenderMeshVisual") as RenderMeshVisual
+    r.mesh = acc.build()
+    r.mainMaterial = this.iconMat
+    // Shift the label right so it sits beside the icon.
+    const lt = label.getSceneObject().getTransform()
+    const p = lt.getLocalPosition()
+    const lw = w - box - 2.4
+    lt.setLocalPosition(new vec3(-w / 2 + box + 1.6 + lw / 2, p.y, p.z))
+    label.layoutRect = Rect.create(-lw / 2, lw / 2, -h / 2 + 0.3, h / 2 - 0.3)
+    // Long names ("Kaftan long sleeve") wrap to two lines instead of shrinking to a sliver.
+    if (label.text.length > 11) {
+      label.horizontalOverflow = HorizontalOverflow.Wrap
+      label.verticalOverflow = VerticalOverflow.Shrink
+    }
+  }
+
+  private iconMat: Material
 
   /** Show menu page idx (0 or 1); hidden pages are disabled so their buttons can't be pinched. */
   showPage(idx: number): void {

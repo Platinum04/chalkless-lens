@@ -1,8 +1,8 @@
 /**
  * ChalkLessMeasurePadUI.ts — passive view: the measurement pad (one measurement at a time,
- * big − / + buttons, big "Next measurement" / "Place pattern" button, live mini preview).
+ * big −5 / − / + / +5 buttons, big "Next measurement" / "Place pattern" button, live mini preview).
  * Exposes: show(), hide(), setMeasurement(...), setMiniPreview(geometry).
- * Emits: onDecrease, onIncrease, onNext (Next measurement or Place pattern).
+ * Emits: onDecrease, onIncrease (±1 step), onDecreaseBig, onIncreaseBig (±5 cm), onNext (Next measurement or Place pattern).
  * Must not: hold measurement values — Main owns them and pushes them in.
  */
 import Event, {PublicApi} from "InteractionKit.lspkg/Utils/Event"
@@ -25,8 +25,8 @@ export class ChalkLessMeasurePadUI extends BaseScriptComponent {
   @ui.group_start("Settings")
   @input
   @hint("Panel width in cm")
-  @widget(new SliderWidget(20, 50, 1))
-  panelWidth: number = 32
+  @widget(new SliderWidget(20, 56, 1))
+  panelWidth: number = 44
   @input
   @hint("Viewing distance used to scale text (cm)")
   @widget(new SliderWidget(60, 250, 1))
@@ -48,6 +48,16 @@ export class ChalkLessMeasurePadUI extends BaseScriptComponent {
   private _onDecrease = new Event<void>()
   private _onIncrease = new Event<void>()
   private _onNext = new Event<void>()
+  private _onDecreaseBig = new Event<void>()
+  private _onIncreaseBig = new Event<void>()
+  /** −5 cm button. */
+  get onDecreaseBig(): PublicApi<void> {
+    return this._onDecreaseBig.publicApi()
+  }
+  /** +5 cm button. */
+  get onIncreaseBig(): PublicApi<void> {
+    return this._onIncreaseBig.publicApi()
+  }
   get onDecrease(): PublicApi<void> {
     return this._onDecrease.publicApi()
   }
@@ -87,14 +97,22 @@ export class ChalkLessMeasurePadUI extends BaseScriptComponent {
     this.stepText = textRow(content, "MeasureStep", "Buba measurement 1 of 7", "Headline2", d, inner, 3, new vec4(0.8, 0.85, 0.9, 1))
     this.nameText = textRow(content, "MeasureName", "Round sleeve (arm)", "Headline1", d, inner, 3.5, new vec4(1, 1, 1, 1))
 
+    // [−5] [−] value [+] [+5]: big ±5 cm jumps beside the fine ±1 cm buttons.
     const row = child(content, "ValueRow")
+    const bw = 6.5
+    const gap = 1.0
     flexItem(row, inner, 7)
-    flexContainer(row, FlexDirection.Row, inner, 7, 1.0, 0)
-    const minus = labeledButton(row, "MinusButton", "−", 7, 7, d, "Title1")
+    flexContainer(row, FlexDirection.Row, inner, 7, gap, 0)
+    const minus5 = labeledButton(row, "MinusFiveButton", "−5", bw, 7, d, "Title2")
+    minus5.button.onTriggerUp.add(() => this._onDecreaseBig.invoke())
+    const minus = labeledButton(row, "MinusButton", "−", bw, 7, d, "Title1")
     minus.button.onTriggerUp.add(() => this._onDecrease.invoke())
-    this.valueText = textRow(row, "MeasureValue", "104 cm", "Title1", d, inner - 16, 7, this.valueColor)
-    const plus = labeledButton(row, "PlusButton", "+", 7, 7, d, "Title1")
+    this.valueText = textRow(row, "MeasureValue", "104 cm", "Title1", d, Math.max(6, inner - 4 * bw - 4 * gap), 7, this.valueColor)
+    this.valueText.horizontalOverflow = HorizontalOverflow.Shrink
+    const plus = labeledButton(row, "PlusButton", "+", bw, 7, d, "Title1")
     plus.button.onTriggerUp.add(() => this._onIncrease.invoke())
+    const plus5 = labeledButton(row, "PlusFiveButton", "+5", bw, 7, d, "Title2")
+    plus5.button.onTriggerUp.add(() => this._onIncreaseBig.invoke())
 
     this.nextBtn = labeledButton(content, "NextMeasurementButton", "Next measurement", inner, 6.5, d, "Headline1")
     this.nextBtn.button.onTriggerUp.add(() => this._onNext.invoke())

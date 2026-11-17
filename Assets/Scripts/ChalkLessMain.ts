@@ -49,6 +49,14 @@ export class ChalkLessMain extends BaseScriptComponent {
   @widget(new SliderWidget(0.5, 5, 0.5))
   stepCm: number = 1
   @input
+  @hint("Step size of the big −5 / +5 buttons (cm)")
+  @widget(new SliderWidget(2, 10, 1))
+  bigStepCm: number = 5
+  @input
+  @hint("How many key measurements the align-stage summary card lists")
+  @widget(new SliderWidget(2, 6, 1))
+  summaryMeasureCount: number = 4
+  @input
   @hint("Where the pattern centre starts on the fabric, relative to the fabric centre (x, z cm)")
   patternStartOffset: vec2 = new vec2(-18, -2)
   @input
@@ -120,7 +128,10 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.garmentMenu.onStyleChosen.add((id) => this.chooseStyle(id))
     this.measurePad.onDecrease.add(() => this.adjustMeasurement(-this.stepCm))
     this.measurePad.onIncrease.add(() => this.adjustMeasurement(this.stepCm))
+    this.measurePad.onDecreaseBig.add(() => this.adjustMeasurement(-this.bigStepCm))
+    this.measurePad.onIncreaseBig.add(() => this.adjustMeasurement(this.bigStepCm))
     this.measurePad.onNext.add(() => this.nextMeasurement())
+    this.stepPanel.onEditMeasurements.add(() => this.editMeasurements())
     this.stepPanel.onStartCutting.add(() => this.startCutting())
     this.stepPanel.onNext.add(() => this.next())
     this.summary.onRestart.add(() => this.restart())
@@ -201,8 +212,32 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.pattern.setCurrentStep(-1)
     this.pattern.setDraggable(true)
     this.stepPanel.showAlign()
+    this.stepPanel.showMeasureSummary(`${this.recipe.name} · Custom fit`, this.keyMeasurementLines())
     this.placeStepPanel()
     print("ChalkLess: phase=align")
+  }
+
+  /** "Edit measurements" on the align-stage card: back to the measure pad, values kept. */
+  editMeasurements(): void {
+    if (this.phase !== "align") return
+    this.phase = "measure"
+    this.pattern.setDraggable(false)
+    this.pattern.setVisible(false)
+    this.stepPanel.hide()
+    this.measureIndex = 0
+    this.measurePad.show()
+    this.refreshGeometry()
+    this.pushMeasurement()
+    print("ChalkLess: phase=measure (edit)")
+  }
+
+  /** The first few measurements (the recipe lists the key ones first), e.g. "Chest  100 cm". */
+  private keyMeasurementLines(): string[] {
+    const defs = this.recipe.measurements
+    const prio = ["chest", "bust", "topLength", "length", "sleeveLength", "waist", "hip"]
+    const picked = defs.filter((d) => prio.indexOf(d.key) >= 0)
+    for (const d of defs) if (picked.indexOf(d) < 0) picked.push(d)
+    return picked.slice(0, this.summaryMeasureCount).map((d) => `${d.label}  ${this.measurements[d.key]} cm`)
   }
 
   startCutting(): void {
@@ -303,7 +338,8 @@ export class ChalkLessMain extends BaseScriptComponent {
     const c = this.pattern.patternCenterWorld
     // Beside the lay, but never further out than just past the fabric's right edge (stays in view, never covers lines).
     const tableHalf = this.pattern.fabricSize.x / 2 + 23
-    const x = Math.min(f.x + tableHalf, Math.max(f.x + this.stepPanelX, c.x + this.pattern.laySizeCm.x / 2 + 24))
+    const x = Math.min(f.x + tableHalf, Math.max(f.x + this.stepPanelX, c.x + this.pattern.laySizeCm.x / 2 + 26))
     this.stepPanel.moveTo(new vec3(x, f.y + 0.6, z))
+    this.stepPanel.setLeaderTarget(this.pattern.currentLineNearestWorld(new vec3(x, f.y, z)))
   }
 }

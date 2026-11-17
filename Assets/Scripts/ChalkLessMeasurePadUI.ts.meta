@@ -61,7 +61,7 @@
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
-    - '// @input float panelWidth = 32 {"hint":"Panel width in cm", "widget":"slider", "min":20, "max":50, "step":1}'
+    - '// @input float panelWidth = 44 {"hint":"Panel width in cm", "widget":"slider", "min":20, "max":56, "step":1}'
     - '// @input float viewDistance = 150 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
     - '// @input float previewScale = 0.17 {"hint":"Mini preview scale (preview cm per pattern cm). Fixed so size changes are visible.", "widget":"slider", "min":0.05, "max":0.4, "step":0.01}'
     - '// @input vec4 previewColor = "{0.4, 0.95, 1, 1}" {"hint":"Mini preview line colour", "widget":"color"}'
