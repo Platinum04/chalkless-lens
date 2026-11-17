@@ -22,6 +22,15 @@
 - Global styles (2026-11-17): suit, blazer, joggers, palazzo, bubu, A-line, sheath, wrap, maxi gown — Assets/Scripts/ChalkLessGlobalRecipes.ts; menu has 2 pages (MenuNextPageButton / MenuPrevPageButton). 16 styles total.
 - Fixed: Suit asked for waist twice (jacket + trousers); now asked once (caught by LEAF).
 - LEAF: 20 tests (C1–C5 Buba criteria, S1–S6, G1–G9 full style flows) — all 20 PASS in Preview 1 and Headless (2026-11-17)
+- "Make it solid" done (2026-11-17): labels clamped inside fabric/wrap to 2 lines, mark labels de-overlapped; Suit shows jacket then trousers lay, Maxi bodice then skirt (fabric ≤ ~157x110); brighter teal buttons with hover/pinch states. All 20 LEAF tests PASS in both previews afterwards.
+
+## UX phase todo (from solid-phase review + user's design concept image)
+- Progress dots ("Step 3 of 7") near the step card; garment icons on menu buttons; small measurement summary card with "Edit measurements"
+- Faster measurement entry (±5 cm)
+- Fit: step panel/table width needs head turns (Specs FOV ~46°); keep step card near the active line
+- Lays still overflow at max measurements (wrap dress ~185 wide); a few labels sit over other pieces' grey lines; Maxi bodice small/sideways
+- Not eyeballed yet: hover highlight; Kaftan short, Dashiki, A-line, Sheath captures
+- Devpost story: real Specs = World Query surface hit test finds the table; fabric edge recognition is roadmap (camera + CV); today the tailor pinch-drags to align
 
 ## Agreed plan (2026-11-17) — FEATURE FREEZE now
 1. Voice "next": optional, off by default; Next button carries the demo
