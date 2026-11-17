@@ -32,6 +32,7 @@
     bigStepCm: false
     chalkMarginCm: false
     debugJumpToStep: false
+    debugMaxMeasurements: false
     debugStyleId: false
     fabric: false
     garmentMenu: false
@@ -66,6 +67,7 @@
       chalkMarginCm: !<float> 4.000000
       debugJumpToStep: !<float> -1.000000
       debugStyleId: buba
+      debugMaxMeasurements: false
   ScriptTypes:
     -
       {}
@@ -93,4 +95,5 @@
     - '// @ui {"widget":"group_start", "label":"Debug"}'
     - '// @input float debugJumpToStep = -1 {"hint":"Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0.. = cutting step, last+1 = summary", "widget":"slider", "min":-3, "max":12, "step":1}'
     - '// @input string debugStyleId = "buba" {"hint":"Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper, suit, blazer, joggers, palazzo, bubu, aLineDress, sheathDress, wrapDress, maxiGown"}'
+    - '// @input bool debugMaxMeasurements {"hint":"Debug jump uses every measurement at its maximum (checks that big lays still fit)"}'
     - '// @ui {"widget":"group_end"}'

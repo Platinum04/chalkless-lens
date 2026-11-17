@@ -692,7 +692,8 @@ function buildMaxi(m: Measurements): PatternGeometry {
     cutStep("skirtHem", [hemLine], sc, `Cut skirt hem — ${len(hemLine)} cm curve`),
   ]
   // The full lay runs ~2 m: show the bodice lay, then the skirt lay.
-  return splitLay(finishLayout(steps), ["Bodice", "Skirt"], ["skirtWaist", "skirtSide", "skirtHem"])
+  // Not transposed as a whole: the bodice lay stays upright; splitLay turns only a group too deep for the table.
+  return splitLay(finishLayout(steps, false), ["Bodice", "Skirt"], ["skirtWaist", "skirtSide", "skirtHem"])
 }
 
 const MAXI: StyleRecipe = {

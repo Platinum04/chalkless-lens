@@ -76,6 +76,9 @@ export class ChalkLessMain extends BaseScriptComponent {
   @input
   @hint("Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper, suit, blazer, joggers, palazzo, bubu, aLineDress, sheathDress, wrapDress, maxiGown")
   debugStyleId: string = "buba"
+  @input
+  @hint("Debug jump uses every measurement at its maximum (checks that big lays still fit)")
+  debugMaxMeasurements: boolean = false
   @ui.group_end
 
   phase: Phase = "menu"
@@ -89,6 +92,7 @@ export class ChalkLessMain extends BaseScriptComponent {
   private geometry: PatternGeometry
   private baseFabric: vec3
   private baseTable: vec3
+  private baseTablePos: vec3
   private tableObj: SceneObject
 
   get styleName(): string {
@@ -138,14 +142,22 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.restart()
     const j = this.debugJumpToStep
     const sid = this.debugStyleId || "buba"
-    if (j === -3 || j === -2) this.chooseStyle(sid)
+    if (j === -3 || j === -2) this.chooseMaybeMax(sid)
     if (j === -2) this.placePattern()
     if (j >= 0) {
-      this.chooseStyle(sid)
+      this.chooseMaybeMax(sid)
       this.placePattern()
       this.startCutting()
       for (let i = 0; i < this.debugJumpToStep; i++) this.next()
     }
+  }
+
+  private chooseMaybeMax(id: string): void {
+    this.chooseStyle(id)
+    if (!this.debugMaxMeasurements) return
+    for (const d of this.recipe.measurements) this.measurements[d.key] = d.maxCm
+    this.refreshGeometry()
+    this.pushMeasurement()
   }
 
   restart(): void {
@@ -308,7 +320,20 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.fabricEnlarged = w > this.baseFabric.x || d > this.baseFabric.z
     if (ft) ft.resize(new vec3(w, this.baseFabric.y, d))
     // Table stays within ~180 × 115 cm so the whole lay is in view from the standing eye position.
-    if (tt && this.baseTable) tt.resize(new vec3(Math.max(this.baseTable.x, w + 20), this.baseTable.y, Math.max(this.baseTable.z, d + 4)))
+    if (tt && this.baseTable) {
+      // Keep room on the right for the flat step card (≈44 cm) so it never hangs off the table on big lays:
+      // widen only to the right and shift the table so its left edge stays put.
+      let tw = Math.max(this.baseTable.x, w + 20)
+      // Card centre as placeStepPanel would put it with the pattern at its start offset, plus its half width.
+      const startX = Math.min(Math.max(0, w / 2 - lay.x / 2 - 2), Math.abs(this.patternStartOffset.x)) * Math.sign(this.patternStartOffset.x)
+      const needRight = Math.min(w / 2 + 23, Math.max(this.stepPanelX, startX + lay.x / 2 + 26)) + 24
+      const extra = Math.max(0, needRight - tw / 2)
+      tw += extra
+      tt.resize(new vec3(tw, this.baseTable.y, Math.max(this.baseTable.z, d + 4)))
+      const tr = this.tableObj.getTransform()
+      if (!this.baseTablePos) this.baseTablePos = tr.getLocalPosition()
+      tr.setLocalPosition(new vec3(this.baseTablePos.x + extra / 2, this.baseTablePos.y, this.baseTablePos.z))
+    }
     this.pattern.fabricSize = new vec2(w, d)
     const f = this.fabric.getTransform().getWorldPosition()
     const maxX = Math.max(0, w / 2 - lay.x / 2 - 2)

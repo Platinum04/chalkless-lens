@@ -2851,6 +2851,7 @@
     chalkMarginCm: true
     debugJumpToStep: true
     debugStyleId: true
+    debugMaxMeasurements: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -2869,6 +2870,7 @@
       chalkMarginCm: !<float> 4.000000
       debugJumpToStep: !<float> -1.000000
       debugStyleId: buba
+      debugMaxMeasurements: false
   ScriptTypes:
     "":
       {}
