@@ -521,6 +521,25 @@
     []
   Components:
     []
+- !<ScriptComponent/1dc2f7e1-2439-4f82-9015-a61fe91f1bab>
+  PrefabRemaps:
+    []
+  Name: ChalkLessVoice
+  Enabled: true
+  ScriptAsset: !<reference> fd2784e8-34e2-4d67-a3d6-e3fdfa2e429a
+  ScriptInputsDefault:
+    enabled: true
+    logTranscripts: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      main: !<MappingBased.AssignableType_1> feafb83e-da84-45aa-bebd-da32928164e7
+      enabled: true
+      logTranscripts: false
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/1e9963e5-9631-4539-9e36-a76b04fb8cf1>
   PrefabRemaps:
     []
@@ -1432,6 +1451,7 @@
     - !<own> 470f3f67-e95e-4de0-9cd5-f09a7a0eb331
   Components:
     - !<own> feafb83e-da84-45aa-bebd-da32928164e7
+    - !<own> 1dc2f7e1-2439-4f82-9015-a61fe91f1bab
 - !<SceneObject/74d13517-1dbf-42e6-b536-27afc4909c65>
   PrefabRemaps:
     []
@@ -1918,13 +1938,12 @@
   ScriptAsset: !<reference> de6c0872-315a-4848-ada8-f24c177c8ee4
   ScriptInputsDefault:
     only: true
-    runOnStart: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       only: ""
-      runOnStart: false
+      runOnStart: true
   ScriptTypes:
     "":
       {}

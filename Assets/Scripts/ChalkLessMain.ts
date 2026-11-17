@@ -15,6 +15,7 @@ import {ChalkLessSummaryUI} from "./ChalkLessSummaryUI"
 import {BUBA, defaultsOf, fabricSavedEstimate, Measurements, PatternGeometry, StyleRecipe} from "./ChalkLessPattern"
 import {findStyle} from "./ChalkLessStyleRecipes"
 import {ChalkLessWorkTable} from "./ChalkLessWorkTable"
+import {prepareCuttingGeometry} from "./ChalkLessConstruction"
 import {ChalkLessTableFinder, TableSurface} from "./ChalkLessTableFinder"
 import {ChalkLessFabricFinder, FabricRect} from "./ChalkLessFabricFinder"
 
@@ -310,7 +311,8 @@ export class ChalkLessMain extends BaseScriptComponent {
     const prio = ["chest", "bust", "topLength", "length", "sleeveLength", "waist", "hip"]
     const picked = defs.filter((d) => prio.indexOf(d.key) >= 0)
     for (const d of defs) if (picked.indexOf(d) < 0) picked.push(d)
-    return picked.slice(0, this.summaryMeasureCount).map((d) => `${d.label}  ${this.measurements[d.key]} cm`)
+    const lines = picked.slice(0, this.summaryMeasureCount).map((d) => `${d.label}  ${this.measurements[d.key]} cm`)
+    return lines.concat([...(this.geometry.fitWarnings || []), ...(this.recipe.reviewNotes || [])].slice(0, 1))
   }
 
   startCutting(): void {
@@ -413,7 +415,7 @@ export class ChalkLessMain extends BaseScriptComponent {
   }
 
   private refreshGeometry(): void {
-    this.geometry = this.recipe.build(this.measurements)
+    this.geometry = prepareCuttingGeometry(this.recipe.build(this.measurements), this.recipe.steps, this.pattern.seamAllowanceCm)
     this.pattern.rebuild(this.geometry)
     this.measurePad.setMiniPreview(this.geometry)
   }

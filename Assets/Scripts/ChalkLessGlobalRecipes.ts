@@ -23,6 +23,9 @@ import {
   polylineLength,
   r,
   sleevePiece,
+  SEAM_CM,
+  NECK_SEAM_CM,
+  HEM_SEAM_CM,
   StepDef,
   StepGeometry,
   StyleRecipe,
@@ -44,6 +47,12 @@ const rect = (x: number, z: number, w: number, h: number): P2[] => [
   [x, z + h],
   [x, z],
 ]
+
+/** A mixed body outline can include a neck, normal seams and a hem in one cut step. */
+function bodyAllowances(points: P2[], neckEdges: number[] = []): number[] {
+  const bottom = Math.max(...points.map((p) => p[1]))
+  return points.slice(1).map((p, k) => neckEdges.indexOf(k) >= 0 ? NECK_SEAM_CM : Math.abs(p[1] - bottom) < 1e-6 && Math.abs(points[k][1] - bottom) < 1e-6 ? HEM_SEAM_CM : SEAM_CM)
+}
 
 // ───────────────────────────── Jacket block (Suit + Blazer) ─────────────────────────────
 
@@ -118,10 +127,11 @@ interface Trouser {
   frontC: P2
   backC: P2
   right: number
+  waistCm: number
 }
 
 /** Front + back legs side by side from x0, top at z0. legHem = full leg hem circumference. */
-function trouserBlock(x0: number, z0: number, waist: number, hip: number, rise: number, L: number, legHem: number, ease: number): Trouser {
+function trouserBlock(x0: number, z0: number, waist: number, hip: number, rise: number, L: number, legHem: number, ease: number, pullOn = false): Trouser {
   const leg = (hq: number, wq: number, ext: number, hem: number, top: number): {pts: P2[]; c: P2; w: number} => {
     const xc = (hq + ext) / 2
     const pts: P2[] = [[hq - wq, top], [hq, 0], [hq, rise - 6]]
@@ -130,8 +140,12 @@ function trouserBlock(x0: number, z0: number, waist: number, hip: number, rise: 
     const minX = Math.min(0, xc - hem / 2)
     return {pts: mv(pts, -minX, 0), c: [xc - minX, L / 2], w: Math.max(hq + ext, xc + hem / 2) - minX}
   }
-  const f = leg(hip / 4 + ease, waist / 4 + 1, hip / 16, legHem / 2 - 1, 0)
-  const b = leg(hip / 4 + ease + 2, waist / 4 + 3, hip / 10, legHem / 2 + 1, -2)
+  // A closed waist has 2 cm wearing ease. A pull-on opening must also clear the hips.
+  const waistCm = pullOn ? Math.max(waist + 2, hip + 4) : waist + 2
+  const q = waistCm / 4
+  const f = leg(hip / 4 + ease, q, hip / 16, legHem / 2 - 1, 0)
+  // The back waist rises 2 cm: account for that diagonal when matching its seam length.
+  const b = leg(hip / 4 + ease + 2, Math.sqrt(q * q - 4), hip / 10, legHem / 2 + 1, -2)
   const bx = x0 + f.w + G
   return {
     front: mv(f.pts, x0, z0),
@@ -139,6 +153,7 @@ function trouserBlock(x0: number, z0: number, waist: number, hip: number, rise: 
     frontC: [f.c[0] + x0, f.c[1] + z0],
     backC: [b.c[0] + bx, b.c[1] + z0],
     right: bx + b.w,
+    waistCm,
   }
 }
 
@@ -152,7 +167,7 @@ const trouserDefs = (waist: number, hip: number, rise: number, L: number, hem: n
 
 function trouserMarks(m: Measurements, t: Trouser, x0: number, z0: number, hemLabel: string): Mark[] {
   return [
-    {a: [x0, z0 + 3], b: [x0 + m.waist / 4 + 1, z0 + 3], label: `Waist ${m.waist} cm`},
+    {a: [x0, z0 + 3], b: [x0 + t.waistCm / 4, z0 + 3], label: `Waist ${m.waist}; seam ${r(t.waistCm)} cm`},
     {a: [x0, z0 + m.crotchDepth * 0.7], b: [x0 + m.hip / 4, z0 + m.crotchDepth * 0.7], label: `Hip ${m.hip} cm`},
     {a: [t.right + 2, z0], b: [t.right + 2, z0 + m.crotchDepth], label: `Rise ${m.crotchDepth} cm`},
     {a: [x0 + 3, z0 + m.crotchDepth], b: [x0 + 3, z0 + m.trouserLength], label: `Length ${m.trouserLength} cm`},
@@ -172,18 +187,19 @@ function buildSuit(m: Measurements): PatternGeometry {
   const collar = rect(sx, sw + G, cl, 9)
   const tz = L + G
   const t = trouserBlock(0, tz, m.waist, m.hip, m.crotchDepth, m.trouserLength, m.hemWidth, 2)
-  const band = rect(t.right + G, tz, 8, m.waist + 6)
+  const bandLength = t.waistCm + 3 // 3 cm closure overlap; cutting allowances are added separately.
+  const band = rect(t.right + G, tz, 8, bandLength)
   const c: P2 = [sx / 2, (tz + m.trouserLength) / 2]
   const steps: StepGeometry[] = [
     fold(L, j.backC, `Fold here · back on the fold, ${r(L)} cm`),
-    measure(c, [...jacketMarks(m, j, sx, sw), ...trouserMarks(m, t, 0, tz, "Leg hem")], "Check the jacket marks · neck, shoulder, chest, waist, length, sleeve"),
-    cutStep("jacketFront", [j.front], j.frontC, `Cut jacket front + lapel · ${len(j.front)} cm outline`, true),
-    cutStep("jacketBack", [j.back], j.backC, `Cut jacket back on the fold · ${len(j.back)} cm`),
+    measure(c, [...jacketMarks(m, j, sx, sw), ...trouserMarks(m, t, 0, tz, "Leg hem"), {a: [t.right + G, tz + t.waistCm], b: [t.right + G + 8, tz + t.waistCm], label: "Band closure: 3 cm overlap", group: 1}], "Check the jacket marks · neck, shoulder, chest, waist, length, sleeve"),
+    cutStep("jacketFront", [j.front], j.frontC, `Cut jacket front + lapel · ${len(j.front)} cm outline`, true, [bodyAllowances(j.front, [3])]),
+    cutStep("jacketBack", [j.back], j.backC, `Cut jacket back on the fold · ${len(j.back)} cm`, false, [bodyAllowances(j.back, [0,1,2,3,4,5,6,7])]),
     cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve · ${len(sleeve)} cm outline`, true),
     cutStep("collar", [collar], [sx + cl / 2, sw + G + 4.5], `Cut collar · ${r(cl)} × 9 cm`, true),
-    cutStep("trouserFront", [t.front], t.frontC, `Cut trouser front · ${len(t.front)} cm outline`, true),
-    cutStep("trouserBack", [t.back], t.backC, `Cut trouser back · ${len(t.back)} cm outline`, true),
-    cutStep("waistband", [band], [t.right + G + 4, tz + (m.waist + 6) / 2], `Cut waistband · ${r(m.waist + 6)} × 8 cm`, true),
+    cutStep("trouserFront", [t.front], t.frontC, `Cut trouser front · ${len(t.front)} cm outline`, true, [bodyAllowances(t.front)]),
+    cutStep("trouserBack", [t.back], t.backC, `Cut trouser back · ${len(t.back)} cm outline`, true, [bodyAllowances(t.back)]),
+    cutStep("waistband", [band], [t.right + G + 4, tz + bandLength / 2], `Cut waistband · ${r(bandLength)} × 8 cm; 3 cm overlap`, true),
   ]
   // 197 × 146 cm in one lay is bigger than the table: show the jacket lay, then the trouser lay.
   return splitLay(finishLayout(steps), ["Jacket", "Trousers"], ["trouserFront", "trouserBack", "waistband"])
@@ -194,6 +210,7 @@ const SUIT: StyleRecipe = {
   name: "Suit",
   buttonName: "SuitButton",
   menuLabel: "Suit",
+  reviewNotes: ["Prototype: collar/facing, sleeve balance and trouser closure need tailor approval."],
   // Jacket and trousers share the waist: ask for it once (jacket's waist), not twice.
   measurements: [...jacketDefs(), ...trouserDefs(84, 100, 27, 104, 42, "Leg hem (round)", 32, 60).filter((d) => d.key !== "waist")],
   steps: [
@@ -226,8 +243,8 @@ function buildBlazer(m: Measurements): PatternGeometry {
   const steps: StepGeometry[] = [
     fold(L, j.backC, `Fold here · back on the fold, ${r(L)} cm`),
     measure(c, jacketMarks(m, j, sx, tw), "Check the marks · neck, shoulder, chest, waist, length, sleeve"),
-    cutStep("front", [j.front], j.frontC, `Cut front + lapel · ${len(j.front)} cm outline`, true),
-    cutStep("back", [j.back], j.backC, `Cut back on the fold · ${len(j.back)} cm`),
+    cutStep("front", [j.front], j.frontC, `Cut front + lapel · ${len(j.front)} cm outline`, true, [bodyAllowances(j.front, [3])]),
+    cutStep("back", [j.back], j.backC, `Cut back on the fold · ${len(j.back)} cm`, false, [bodyAllowances(j.back, [0,1,2,3,4,5,6,7])]),
     cutStep("topSleeve", [top], [sx + m.sleeveLength / 2, tw / 2], `Cut top sleeve · ${len(top)} cm outline`, true),
     cutStep("underSleeve", [under], [sx + m.sleeveLength / 2, tw + G + uw / 2], `Cut under sleeve · ${len(under)} cm outline`, true),
   ]
@@ -239,6 +256,7 @@ const BLAZER: StyleRecipe = {
   name: "Blazer",
   buttonName: "BlazerButton",
   menuLabel: "Blazer",
+  reviewNotes: ["Prototype: collar/facing, two-piece sleeve balance and closure need tailor approval."],
   measurements: jacketDefs().map((d) => (d.key === "jacketLength" ? def("jacketLength", "Blazer length", 70, 55, 85) : d)),
   steps: [...FOLD_MEASURE, step("front", "Front + lapel"), step("back", "Back"), step("topSleeve", "Top sleeve"), step("underSleeve", "Under sleeve")],
   build: buildBlazer,
@@ -250,14 +268,14 @@ const BLAZER: StyleRecipe = {
 
 function buildJoggers(m: Measurements): PatternGeometry {
   const L = m.trouserLength - m.cuffHeight
-  const t = trouserBlock(0, 0, m.waist, m.hip, m.crotchDepth, L, m.hemWidth + 8, 4)
-  const bandW = m.bandWidth * 2 + 2
-  const bandL = m.hip * 0.9
+  const t = trouserBlock(0, 0, m.waist, m.hip, m.crotchDepth, L, m.hemWidth + 8, 4, true)
+  const bandW = (m.bandWidth + 0.5) * 2 // Finished casing clearance; seam allowances are added once.
+  const bandL = t.waistCm
   const bx = t.right + G
   const band = rect(bx, 0, bandW, bandL)
   const cx = bx + bandW + G
-  const cuffL = m.hemWidth + 3
-  const cuffH = m.cuffHeight * 2 + 3
+  const cuffL = m.hemWidth
+  const cuffH = m.cuffHeight * 2
   const cuff = rect(cx, 0, cuffH, cuffL)
   const c: P2 = [t.right / 2, L / 2]
   const steps: StepGeometry[] = [
@@ -282,7 +300,9 @@ function buildJoggers(m: Measurements): PatternGeometry {
     cutStep("waistband", [band], [bx + bandW / 2, bandL / 2], `Cut elastic waistband · ${r(bandL)} × ${r(bandW)} cm`, true),
     cutStep("cuff", [cuff], [cx + cuffH / 2, cuffL / 2], `Cut ankle cuff · ${r(cuffL)} × ${r(cuffH)} cm (cut 2)`, true),
   ]
-  return finishLayout(steps)
+  const geometry = finishLayout(steps)
+  geometry.fitWarnings = [`Stretch cuffs must extend ${Math.ceil(800 / m.hemWidth)}% to fit the leg opening. Test the rib fabric first.`]
+  return geometry
 }
 
 const JOGGERS: StyleRecipe = {
@@ -307,14 +327,15 @@ function buildPalazzo(m: Measurements): PatternGeometry {
   const L = m.trouserLength
   const t = trouserBlock(0, 0, m.waist, m.hip, m.crotchDepth, L, m.hemWidth, 3)
   const bx = t.right + G
-  const band = rect(bx, 0, 10, m.waist + 6)
+  const bandLength = t.waistCm + 3
+  const band = rect(bx, 0, 10, bandLength)
   const c: P2 = [t.right / 2, L / 2]
   const steps: StepGeometry[] = [
     fold(L, c, `Fold selvedge to selvedge · cut 2 of each leg`),
-    measure(c, trouserMarks(m, t, 0, 0, "Leg hem"), "Check the marks · waist, hip, rise, length, wide hem"),
-    cutStep("front", [t.front], t.frontC, `Cut wide-leg front · ${len(t.front)} cm outline`, true),
-    cutStep("back", [t.back], t.backC, `Cut wide-leg back · ${len(t.back)} cm outline`, true),
-    cutStep("waistband", [band], [bx + 5, (m.waist + 6) / 2], `Cut waistband · ${r(m.waist + 6)} × 10 cm`, true),
+    measure(c, [...trouserMarks(m, t, 0, 0, "Leg hem"), {a: [bx, t.waistCm], b: [bx + 10, t.waistCm], label: "Band closure: 3 cm overlap"}], "Check the marks · waist, hip, rise, length, wide hem"),
+    cutStep("front", [t.front], t.frontC, `Cut wide-leg front · ${len(t.front)} cm outline`, true, [bodyAllowances(t.front)]),
+    cutStep("back", [t.back], t.backC, `Cut wide-leg back · ${len(t.back)} cm outline`, true, [bodyAllowances(t.back)]),
+    cutStep("waistband", [band], [bx + 5, bandLength / 2], `Cut waistband · ${r(bandLength)} × 10 cm; 3 cm overlap`, true),
   ]
   return finishLayout(steps)
 }
@@ -534,9 +555,10 @@ function buildSheath(m: Measurements): PatternGeometry {
   const hq = m.hip / 4 + 2
   const hz = Math.min(L - 10, wz + 20)
   const c: P2 = [hq / 2, L / 2]
+  const dw = Math.min(5, Math.max(2, (m.bust - m.waist) / 8))
   const side: P2[] = [
     [b.bq, b.ad],
-    [wq + 2.5, wz],
+    [wq + dw, wz],
     [hq, hz],
     [hq - 2, L],
   ]
@@ -545,7 +567,6 @@ function buildSheath(m: Measurements): PatternGeometry {
     [0, L],
   ]
   const dx = b.bq * 0.5
-  const dw = Math.min(5, Math.max(2, (m.bust - m.waist) / 8))
   const dart: P2[] = [
     [dx, b.ad + 3],
     [dx + dw / 2, wz],
@@ -571,6 +592,7 @@ const SHEATH: StyleRecipe = {
   name: "Sheath dress",
   buttonName: "SheathDressButton",
   menuLabel: "Sheath dress",
+  reviewNotes: ["Prototype: front/back balance, dart placement and zip need tailor fitting."],
   measurements: [...dressBase(95), def("waistLength", "Nape to waist", 40, 32, 50)],
   steps: dressSteps([step("waistDart", "Waist dart", "mark")]),
   build: buildSheath,
@@ -615,8 +637,8 @@ function buildWrap(m: Measurements): PatternGeometry {
       ],
       "Check the marks · neck, bust, waist, hip, length, sleeve, tie",
     ),
-    cutStep("back", [back], c, `Cut back on the fold · ${len(back)} cm`),
-    cutStep("wrapFront", [front], [fx + span / 2, L / 2], `Cut wrap front · ${len(front)} cm outline (cut 2)`, true),
+    cutStep("back", [back], c, `Cut back on the fold · ${len(back)} cm`, false, [bodyAllowances(back, [0,1,2,3,4,5,6,7])]),
+    cutStep("wrapFront", [front], [fx + span / 2, L / 2], `Cut wrap front · ${len(front)} cm outline (cut 2)`, true, [bodyAllowances(front, [12])]),
     cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve · ${len(sleeve)} cm outline`, true),
     cutStep("tie", [tie], [tx + 4, tieL / 2], `Cut tie belt · ${r(tieL)} × 8 cm (cut 2)`, true),
   ]
@@ -628,6 +650,7 @@ const WRAP: StyleRecipe = {
   name: "Wrap dress",
   buttonName: "WrapDressButton",
   menuLabel: "Wrap dress",
+  reviewNotes: ["Prototype: wrap coverage, neckline finish and sleeve pitch need tailor fitting."],
   measurements: [
     ...dressBase(105),
     def("waistLength", "Nape to waist", 40, 32, 50),
@@ -647,8 +670,9 @@ function buildMaxi(m: Measurements): PatternGeometry {
   const BL = m.bodiceLength
   const wq = m.waist / 4 + 2
   const SL = m.skirtLength
-  const waistArc = m.waist / 4 + 1
-  const theta = Math.min(Math.PI / 2, Math.max(0.15, (m.hemSweep / 4 - waistArc) / SL))
+  const waistArc = wq // Same stitching circumference as the bodice, including its ease.
+  const theta = (m.hemSweep / 4 - waistArc) / SL
+  if (!(theta > 0 && theta <= Math.PI / 2)) throw new Error("Skirt sweep must exceed the waist and fit a quarter-sector layout")
   const rw = waistArc / theta
   const z0 = BL + G + rw
   const cz = z0 - rw
@@ -701,6 +725,7 @@ const MAXI: StyleRecipe = {
   name: "Maxi / ball gown",
   buttonName: "MaxiGownButton",
   menuLabel: "Maxi / ball gown",
+  reviewNotes: ["Prototype bodice: darts and closure need tailor fitting. Use fresh cloth for the skirt lay."],
   measurements: [
     def("neck", "Neck", 36, 28, 50),
     def("shoulder", "Shoulder", 38, 30, 50),

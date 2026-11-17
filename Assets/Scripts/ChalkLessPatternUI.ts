@@ -1,7 +1,7 @@
 /**
  * ChalkLessPatternUI.ts — passive view of the full-size buba pattern lying on the fabric.
  * Owns: line meshes per step, state colours (current glows, finished grey, future faint),
- * direction arrows + dashed 1.5 cm seam allowance on the current cut, measure-mark labels,
+ * direction arrows on the actual cut and a dashed stitching line inside its allowance, measure-mark labels,
  * and the pinch-drag (SIK Interactable + InteractableManipulation) constrained to the fabric plane.
  * Exposes: rebuild(geometry), setCurrentStep(i), setDraggable(bool), setVisible(bool),
  *          currentLineAnchorWorld(), patternCenterWorld, lineStates (for tests).
@@ -10,7 +10,7 @@
 import {Interactable} from "InteractionKit.lspkg/Components/Interaction/Interactable/Interactable"
 import {InteractableManipulation} from "InteractionKit.lspkg/Components/Interaction/InteractableManipulation/InteractableManipulation"
 import {MeshAccumulator, tintedMaterial} from "./ChalkLessLines"
-import {offsetOutward, P2, PatternGeometry, shownLaySize} from "./ChalkLessPattern"
+import {P2, PatternGeometry, shownLaySize} from "./ChalkLessPattern"
 import {applyTextRole} from "./ChalkLessStyleUI"
 
 /** Text heights (cm) lying on the fabric; text size per cm calibrated in the preview. */
@@ -54,7 +54,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
   @hint("Fabric size in cm (width along X, depth along Z)")
   fabricSize: vec2 = new vec2(150, 80)
   @input
-  @hint("Seam allowance drawn outside each cut line (cm)")
+  @hint("Body allowance between the solid cutting line and dashed stitching line (cm). Necks and hems use their own allowances.")
   @widget(new SliderWidget(0.5, 3, 0.1))
   seamAllowanceCm: number = 1.5
   @input
@@ -250,7 +250,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       })
       const seam = mk("SeamAllowance", 0.08, (a) => {
         if (st.marks.length > 0 || st.label.indexOf("Cut") !== 0) return
-        for (const l of st.lines) a.dashed(offsetOutward(l, st.centroid, this.seamAllowanceCm), 0.25, 1.2, 0.9)
+        for (const l of st.stitchLines || []) a.dashed(l, 0.25, 1.2, 0.9)
       })
       const arrows = mk("Arrows", 0.14, (a) => {
         if (st.label.indexOf("Cut") !== 0) return

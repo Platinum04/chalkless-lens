@@ -22,6 +22,7 @@ import {G8WrapDress} from "./G8WrapDress"
 import {G9MaxiGown} from "./G9MaxiGown"
 import {D1DetectionFallback} from "./D1DetectionFallback"
 import {D2FabricSegmentation} from "./D2FabricSegmentation"
+import {V1VoiceCommands} from "./V1VoiceCommands"
 
 @component
 export class LeafIndex extends BaseScriptComponent {
@@ -49,5 +50,6 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "g9-maxi-gown", typename: G9MaxiGown.getTypeName()},
     {id: "d1-detection-fallback", typename: D1DetectionFallback.getTypeName()},
     {id: "d2-fabric-segmentation", typename: D2FabricSegmentation.getTypeName()},
+    {id: "v1-voice-commands", typename: V1VoiceCommands.getTypeName()},
   ]
 }

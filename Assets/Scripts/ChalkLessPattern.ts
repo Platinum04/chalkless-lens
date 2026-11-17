@@ -1,7 +1,7 @@
 /**
  * ChalkLessPattern.ts — pure pattern maths shared by every garment style + the Buba recipe.
  * Owns: types (measurements, steps, geometry, StyleRecipe), drafting helpers (arcs, offsets,
- * transpose-to-fit), the fabric-saved estimate, and the Buba recipe (kept exactly: 7 measurements,
+ * explicit layout transforms), the fabric-saved estimate, and the Buba recipe (kept exactly: 7 measurements,
  * 7 steps fold/measure/neckline/shoulder/sleeve/sideSeam/hem).
  * Geometry is pattern-local XZ: x = away from the fold, z = down the length (before any transpose).
  * Other styles live in ChalkLessStyleRecipes.ts. Must not: touch SceneObjects or UI.
@@ -46,6 +46,15 @@ export interface StepGeometry {
   label: string // step label text, lengths calculated from measurements ("Cut ..." = cut line)
   /** Lay group (0 = first lay shown); only set for big styles split into groups. */
   group?: number
+  /** Recipe coordinates are stitching lines. Prepared geometry stores the actual cut in lines. */
+  stitchLines?: P2[][]
+  /** Optional allowance per segment, for mixed neck/body/hem outlines. */
+  allowances?: number[][]
+  /** Separate pieces can share a step, but must retain their own inside reference. */
+  lineCentroids?: P2[]
+  /** Grain direction in this lay, transformed with the piece instead of guessed from screen size. */
+  grainDirection?: P2
+  quantity?: number
 }
 
 /** One group of pieces shown on the fabric at a time (coords of its steps start at 0,0). */
@@ -63,6 +72,7 @@ export interface PatternGeometry {
   transposed?: boolean
   /** Big styles: pieces shown one group at a time; each step's coords are local to its group. */
   groups?: LayGroup[]
+  fitWarnings?: string[]
 }
 
 /** One garment style: everything Main needs to drive menu → measure → cut → summary. */
@@ -78,6 +88,7 @@ export interface StyleRecipe {
   piecesText(m: Measurements): string
   /** Area (cm²) a standard chalk layout would use for the same pieces. */
   chalkLayoutAreaCm2(g: PatternGeometry, marginCm: number): number
+  reviewNotes?: string[]
 }
 
 export function defaultsOf(defs: MeasurementDef[]): Measurements {
@@ -132,15 +143,22 @@ export function easeCurve(p: P2, q: P2, n = 10): P2[] {
   return out
 }
 
-export function cutStep(id: string, lines: P2[][], centroid: P2, label: string, closed = false): StepGeometry {
-  return {id, lines, closed, centroid, marks: [], label}
+export function cutStep(id: string, lines: P2[][], centroid: P2, label: string, closed = false, allowances?: number[][]): StepGeometry {
+  let grainDirection: P2 = [0, 1]
+  if (["sleeve", "topSleeve", "underSleeve", "collar", "cuff"].indexOf(id) >= 0) grainDirection = [1, 0]
+  if (id === "waistband" || id === "tie") {
+    const p = lines.flat()
+    if (Math.max(...p.map((q) => q[0])) - Math.min(...p.map((q) => q[0])) > Math.max(...p.map((q) => q[1])) - Math.min(...p.map((q) => q[1]))) grainDirection = [1, 0]
+  }
+  const quantity = ["sleeve", "topSleeve", "underSleeve", "collar", "cuff", "tie", "jacketFront", "trouserFront", "trouserBack", "wrapFront"].indexOf(id) >= 0 || (closed && (id === "front" || id === "back" || id.indexOf("cut") === 0)) ? 2 : 1
+  return {id, lines, closed, centroid, marks: [], label, allowances, grainDirection, quantity}
 }
 
 /**
- * Finalise a layout: shift so cut lines start at (0,0), measure extent, and when the pattern is
- * deeper than the fabric (long robes), turn it 90° so the length runs along the fabric width.
+ * Finalise a layout: shift its drafting lines into positive coordinates and measure the extent.
+ * Preserve grain orientation by default. A transpose requires an explicit caller decision.
  */
-export function finishLayout(steps: StepGeometry[], allowTranspose = true): PatternGeometry {
+export function finishLayout(steps: StepGeometry[], allowTranspose = false): PatternGeometry {
   let minX = Infinity
   let minZ = Infinity
   let maxX = -Infinity
@@ -162,10 +180,13 @@ export function finishLayout(steps: StepGeometry[], allowTranspose = true): Patt
   const transpose = allowTranspose && l > FABRIC_DEPTH_FIT_CM && w < l
   const map = (p: P2): P2 => (transpose ? [p[1] + sz, p[0] + sx] : [p[0] + sx, p[1] + sz])
   const out: StepGeometry[] = steps.map((st) => ({
+    ...st,
     id: st.id,
     lines: st.lines.map((ln) => ln.map(map)),
     closed: st.closed,
     centroid: map(st.centroid),
+    lineCentroids: st.lineCentroids?.map(map),
+    grainDirection: st.grainDirection && (transpose ? [st.grainDirection[1], st.grainDirection[0]] : st.grainDirection),
     marks: st.marks.map((mk) => ({a: map(mk.a), b: map(mk.b), label: mk.label})),
     label: st.label,
   }))
@@ -180,7 +201,7 @@ export function finishLayout(steps: StepGeometry[], allowTranspose = true): Patt
 /**
  * Split a big lay into two groups shown one after the other (e.g. jacket, then trousers).
  * widthCm/lengthCm stay the full lay (pattern size + fabric estimate unchanged); every step's
- * coordinates are moved so its group starts at (0,0), turned 90° when that group is too deep for the table.
+ * coordinates are moved so its group starts at (0,0), preserving its cloth grain direction.
  * The fold line is clipped to group 0; measure marks go to the group whose pieces contain them.
  */
 export function splitLay(g: PatternGeometry, names: [string, string], group1Ids: string[]): PatternGeometry {
@@ -209,7 +230,8 @@ export function splitLay(g: PatternGeometry, names: [string, string], group1Ids:
     grow(k, mk.b)
   }
   // Turn a group only when it is too deep for the table and wider would fit better.
-  const turn = box.map((b) => b.z1 - b.z0 > FABRIC_DEPTH_FIT_CM + 24 && b.z1 - b.z0 > b.x1 - b.x0)
+  // Cloth grain and nap decide orientation. A table's dimensions must not rotate a piece silently.
+  const turn = box.map(() => false)
   const map = (k: number, p: P2): P2 => {
     const b = box[k]
     const x = p[0] - b.x0
@@ -223,10 +245,13 @@ export function splitLay(g: PatternGeometry, names: [string, string], group1Ids:
   const steps: StepGeometry[] = g.steps.map((st) => {
     const k = grp(st)
     return {
+      ...st,
       id: st.id,
       lines: st.lines.map((ln) => ln.map((p) => map(k, st.id === "fold" ? clip(k, p) : p))),
       closed: st.closed,
       centroid: map(k, st.centroid),
+      lineCentroids: st.lineCentroids?.map((c) => map(k, c)),
+      grainDirection: st.grainDirection && (turn[k] ? [st.grainDirection[1], st.grainDirection[0]] : st.grainDirection),
       marks: st.marks.map((mk) => {
         const mg = markGroup(mk)
         return {a: map(mg, mk.a), b: map(mg, mk.b), label: mk.label, group: mg}
@@ -240,6 +265,8 @@ export function splitLay(g: PatternGeometry, names: [string, string], group1Ids:
     const l = b.z1 - b.z0
     return {name: names[k], widthCm: turn[k] ? l : w, lengthCm: turn[k] ? w : l}
   })
+  const firstNewLay = steps.find((st) => st.group === 1 && st.lines.length > 0)
+  if (firstNewLay) firstNewLay.label = firstNewLay.label.replace(" · ", " on fresh cloth · ")
   return {widthCm: g.widthCm, lengthCm: g.lengthCm, steps, transposed: g.transposed, groups}
 }
 
@@ -346,6 +373,34 @@ export function sleevePiece(sx: number, z0: number, sw: number, SL: number, cuff
   return pts
 }
 
+/** Match the sampled cap seam to the actual armhole, instead of assuming a 10 cm cap fits. */
+export function matchedSleeve(sx: number, z0: number, sw: number, SL: number, cuffW: number, armholeCm: number): {points: P2[]; warning?: string} {
+  const capLength = (cap: number, width = sw): number => polylineLength(sleevePiece(0, 0, width, SL, cuffW, cap).slice(0, 17))
+  const maxCap = Math.max(0.1, SL - 1)
+  if (sw > armholeCm) return {points: sleevePiece(sx, z0, sw, SL, cuffW, Math.min(10, maxCap)), warning: "Arm circumference and armhole conflict. Adjust measurements with a tailor."}
+  let width = sw
+  let warning: string | undefined
+  if (capLength(maxCap) < armholeCm) {
+    let lo = sw
+    let hi = armholeCm
+    for (let i = 0; i < 50; i++) {
+      const mid = (lo + hi) / 2
+      if (capLength(maxCap, mid) < armholeCm) lo = mid
+      else hi = mid
+    }
+    width = (lo + hi) / 2
+    warning = "Short sleeve needs extra upper-arm room to match the armhole. Tailor check required."
+  }
+  let lo = 0
+  let hi = maxCap
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2
+    if (capLength(mid, width) < armholeCm) lo = mid
+    else hi = mid
+  }
+  return {points: sleevePiece(sx, z0, width, SL, Math.min(cuffW, width), (lo + hi) / 2), warning}
+}
+
 export function buildPattern(m: Measurements): PatternGeometry {
   const nw = m.neck / 6 // half neck width
   const nd = m.neck / 6 + 2 // front neck depth
@@ -356,7 +411,8 @@ export function buildPattern(m: Measurements): PatternGeometry {
   const hw = m.hip / 4 + BODY_EASE_CM // quarter hip + ease
   const L = m.topLength
   const bodyW = Math.max(cw, hw)
-  const sx = bodyW + PIECE_GAP_CM
+  const backX = bodyW + PIECE_GAP_CM
+  const sx = backX + bodyW + PIECE_GAP_CM
   const sw = m.roundSleeve + 6
   const SL = m.sleeveLength
   const cap = SLEEVE_CAP_CM
@@ -369,8 +425,9 @@ export function buildPattern(m: Measurements): PatternGeometry {
     [nw, 0],
     [sh, drop],
   ]
-  const sleeve = sleevePiece(sx, 0, sw, SL, sw - 4, cap)
   const side = easeCurve([sh, drop], [cw, ad])
+  const fittedSleeve = matchedSleeve(sx, 0, sw, SL, sw - 4, 2 * polylineLength(side))
+  const sleeve = fittedSleeve.points
   side.push([hw, L])
   const hem: P2[] = [
     [hw, L],
@@ -402,7 +459,19 @@ export function buildPattern(m: Measurements): PatternGeometry {
     cutStep("hem", [hem], bodyC, `Cut hem · ${r(polylineLength(hem))} cm straight`),
   ]
 
-  return {widthCm: sx + SL, lengthCm: Math.max(L, sw + 2), steps}
+  // Front and back have separate necklines, and are cut separately on their own folds.
+  const move = (line: P2[]): P2[] => line.map((p) => [p[0] + backX, p[1]])
+  const backC: P2 = [backX + bodyW / 2, L / 2]
+  steps[0].lines.push([[backX, -2], [backX, L + 2]])
+  steps[0].label = "Fold each body piece separately; front neck deeper than back"
+  steps[2].lines.push(move(arc(0, 0, nw, 2.5, 0, Math.PI / 2, 12)))
+  steps[2].label = "Cut front and back necklines separately"
+  for (const k of [3, 5, 6]) steps[k].lines.push(move(steps[k].lines[0]))
+  for (const k of [2, 3, 5, 6]) steps[k].lineCentroids = [bodyC, backC]
+  steps[3].label = "Cut both shoulder seams"
+  steps[5].label = "Cut both armholes and side seams"
+  steps[6].label = "Cut front and back hems"
+  return {widthCm: sx + SL, lengthCm: Math.max(L, sw + 2), steps, fitWarnings: fittedSleeve.warning ? [fittedSleeve.warning] : []}
 }
 
 export const BUBA: StyleRecipe = {
@@ -413,6 +482,6 @@ export const BUBA: StyleRecipe = {
   measurements: MEASUREMENTS,
   steps: STEPS,
   build: buildPattern,
-  piecesText: () => "Pieces cut: 3 (front on the fold + 2 sleeves)",
+  piecesText: () => "Pieces cut: 4 (front on its fold, back on its fold, 2 mirrored sleeves)",
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }

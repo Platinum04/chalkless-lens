@@ -24,6 +24,7 @@ import {
   polylineLength,
   r,
   sleevePiece,
+  matchedSleeve,
   StepGeometry,
   StyleRecipe,
 } from "./ChalkLessPattern"
@@ -81,8 +82,9 @@ function buildKaftan(m: Measurements, long: boolean): PatternGeometry {
     [nw, 0],
     [sh, drop],
   ]
-  const sleeve = sleevePiece(sx, 0, sw, SL, cuff)
   const side = easeCurve([sh, drop], [cw, ad])
+  const fittedSleeve = matchedSleeve(sx, 0, sw, SL, cuff, 2 * polylineLength(side))
+  const sleeve = fittedSleeve.points
   side.push([hw, hipZ])
   side.push([hemW, L])
   const hem: P2[] = [
@@ -111,7 +113,9 @@ function buildKaftan(m: Measurements, long: boolean): PatternGeometry {
     cutStep("sideSeam", [side], bodyC, `Cut side seam · ${len(side)} cm, slit open last ${r(m.slit)} cm`),
     cutStep("hem", [hem], bodyC, `Cut hem · ${len(hem)} cm at the ankle`),
   ]
-  return finishLayout(steps)
+  const geometry = finishLayout(steps)
+  geometry.fitWarnings = fittedSleeve.warning ? [fittedSleeve.warning] : []
+  return geometry
 }
 
 function kaftan(long: boolean): StyleRecipe {
@@ -422,6 +426,7 @@ const CORSET: StyleRecipe = {
   name: "Ladies' corset",
   buttonName: "CorsetButton",
   menuLabel: "Ladies' corset",
+  reviewNotes: ["Prototype: underbust, bust height, closure and boning need a corset maker's fitting."],
   measurements: [
     def("bust", "Bust", 88, 70, 130),
     def("waist", "Waist", 70, 50, 110),
@@ -447,6 +452,8 @@ function buildWrapper(m: Measurements): PatternGeometry {
   const L = m.skirtLength
   const wbL = m.waist * 0.75 + 2 // half waistband (waist × 1.5 wrap) + overlap
   const wbH = m.waistband * 2
+  const waistW = wbL // Match the band attachment; overlap is waist * 0.5 + 4 cm.
+  const hipZ = Math.min(20, L / 2)
   const z0 = L + 6
   const sc: P2 = [hwid / 2, L / 2]
   const bc: P2 = [wbL / 2, z0 + wbH / 2]
@@ -458,7 +465,8 @@ function buildWrapper(m: Measurements): PatternGeometry {
   ]
   const sides: P2[] = [
     [0, 0],
-    [hwid, 0],
+    [waistW, 0],
+    [hwid, hipZ],
     [hwid, L],
   ]
   const hem: P2[] = [
