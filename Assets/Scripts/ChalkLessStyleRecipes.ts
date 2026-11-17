@@ -388,9 +388,9 @@ function buildCorset(m: Measurements): PatternGeometry {
       c = [cx, H / 2]
       gx = cx
     }
-    grains.push({a: [gx, 5], b: [gx, H - 5], label: `${p.abbr} grain`})
+    grains.push({a: [gx, 5], b: [gx, H - 5], label: p.abbr})
     cuts.push(
-      cutStep(p.id, [pts], c, `Cut panel ${i + 1}/6 ${p.abbr} — ${len(pts)} cm, keep grain straight`, i > 0),
+      cutStep(p.id, [pts], c, `Cut panel ${i + 1}/6 ${p.abbr} — ${len(pts)} cm`, i > 0),
     )
     x += mw + gap
   })
@@ -405,8 +405,8 @@ function buildCorset(m: Measurements): PatternGeometry {
         {a: [0, BL - 3], b: [ext, BL - 3], label: `Waist ${m.waist} cm`},
         {a: [0, H + 2], b: [ext, H + 2], label: `Hip ${m.hip} cm`},
         {a: [0, 2], b: [m.bustPoint / 2, 2], label: `BP ${m.bustPoint} cm`},
-        {a: [ext + 3, 0], b: [ext + 3, BL], label: `Bodice ${m.bodiceLength} cm`},
-        {a: [ext + 3, BL], b: [ext + 3, H], label: `Waist–hip ${m.waistToHip} cm`},
+        {a: [ext + 3, 0], b: [ext + 3, BL], label: `BL ${m.bodiceLength}`},
+        {a: [ext + 3, BL], b: [ext + 3, H], label: `W–H ${m.waistToHip}`},
         ...grains,
       ],
       "Check the marks — bust, waist, hip and the grainline on every panel",
