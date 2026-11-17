@@ -19,12 +19,17 @@
 - Chest and sleeve length now change the Buba outline (default 65x70 cm)
 - LEAF re-run after styles: all 5 PASS in Preview 1 and Headless (C3 drag made longer/slower; it was flaky in headless)
 - LEAF style tests S1–S6 (Kaftan long/short, Agbada, Dashiki, Corset, Wrapper): full flow with real pinches — all 11 tests PASS in Preview 1 and Headless (2026-11-17)
+- Global styles (2026-11-17): suit, blazer, joggers, palazzo, bubu, A-line, sheath, wrap, maxi gown — Assets/Scripts/ChalkLessGlobalRecipes.ts; menu has 2 pages (MenuNextPageButton / MenuPrevPageButton). 16 styles total.
+- Fixed: Suit asked for waist twice (jacket + trousers); now asked once (caught by LEAF).
+- LEAF: 20 tests (C1–C5 Buba criteria, S1–S6, G1–G9 full style flows) — all 20 PASS in Preview 1 and Headless (2026-11-17)
 
-## Next
-- Global styles: suit, blazer, joggers, palazzo, bubu, more ladies' dresses
-- Polish: long labels run past their piece (Kaftan sleeve, wrapper waistband)
-- Voice "next" (not built; Next button covers it)
-- Demo video plan (<3 min); make repo public or share with Devpost before Dec 5
+## Agreed plan (2026-11-17) — FEATURE FREEZE now
+1. Voice "next": optional, off by default; Next button carries the demo
+2. Make it solid: faint buttons, labels running past pieces, big lays fitting the table (suit 197x146, maxi 208x80); re-run all 20 tests after every change
+3. UX and flow: faster measurement entry (±5 cm), one piece at a time for big styles, clear prompts per stage
+4. Review in Interactive Preview (brief's comfort checklist) + real tailor check of shapes
+5. Devpost: video <3 min (focus on one or two deep cuts, quick menu shot), write-up, repo public
+6. Submit target Dec 1–2 (deadline Dec 5)
 
 ## How to run tests
 - LEAF panel "Run" cancels itself in LS 5.25 ("Scenario run cancelled"). Workaround: on the LeafIndex object, tick `runOnStart` on ChalkLessScenarioClient, recompile, and grep the Lens Studio log for `LEAF-RESULT`. Untick when done.

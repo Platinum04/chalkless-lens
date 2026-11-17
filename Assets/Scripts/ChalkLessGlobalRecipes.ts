@@ -192,7 +192,8 @@ const SUIT: StyleRecipe = {
   name: "Suit",
   buttonName: "SuitButton",
   menuLabel: "Suit",
-  measurements: [...jacketDefs(), ...trouserDefs(84, 100, 27, 104, 42, "Leg hem (round)", 32, 60)],
+  // Jacket and trousers share the waist: ask for it once (jacket's waist), not twice.
+  measurements: [...jacketDefs(), ...trouserDefs(84, 100, 27, 104, 42, "Leg hem (round)", 32, 60).filter((d) => d.key !== "waist")],
   steps: [
     ...FOLD_MEASURE,
     step("jacketFront", "Jacket front + lapel"),

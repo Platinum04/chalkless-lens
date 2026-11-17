@@ -24,6 +24,17 @@ The tailor picks a style, enters the client's measurements, and the glasses lay 
 | Dashiki | fold → measure → V-neck → yoke (marked) → shoulder + sleeve → sleeve end → underarm + side → hem |
 | Ladies' corset | fold → measure + grainlines → panels, front to back (6 panels, 11 pieces) |
 | Wrapper skirt | fold → measure → waistband → waist + side edges → hem |
+| Suit (jacket + trousers) | fold → measure → jacket front + lapel → jacket back → sleeve → collar → trouser front → trouser back → waistband |
+| Blazer | fold → measure → front + lapel → back → top sleeve → under sleeve |
+| Joggers | fold → measure → front → back → waistband → cuff |
+| Palazzo trousers (ladies) | fold → measure → front → back → waistband |
+| Bubu (ladies' gown) | fold → measure → neckline → shoulder + sleeve → sleeve end → side seam → hem |
+| A-line dress | fold → measure → neckline → shoulder → armhole → side seam → hem |
+| Sheath dress | fold → measure → neckline → shoulder → armhole → waist dart (marked) → side seam → hem |
+| Wrap dress | fold → measure → back → wrap front → sleeve → tie |
+| Maxi gown | fold → measure → neckline → shoulder → armhole → bodice side → skirt waist → skirt side → skirt hem |
+
+16 styles from around the world, from Nigerian classics to everyday global wear, on a two-page menu.
 
 All styles work in the preview. Each style is a pattern recipe: it builds the pattern pieces from the measurements and sets the order of the cuts. The fabric can be anything: ankara, aso-oke, lace, suit cloth or kaftan fabric.
 

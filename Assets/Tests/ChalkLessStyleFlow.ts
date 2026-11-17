@@ -7,11 +7,12 @@ import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {ChalkLessInteractor, getMain, uiChild, waitPhase} from "./ChalkLessLeafHelpers"
 
-export async function runStyleFlow(styleId: string, buttonName: string, stepIds: string[]): Promise<void> {
+export async function runStyleFlow(styleId: string, buttonName: string, stepIds: string[], page2 = false): Promise<void> {
   await sleep(1500)
   const m = getMain()
   const i = new ChalkLessInteractor()
   await waitPhase(m, "menu", 5000)
+  if (page2) await i.pinch("MenuNextPageButton")
   await i.pinch(buttonName)
   await waitPhase(m, "measure")
   expect(m.styleId).toBe(styleId)
@@ -27,7 +28,9 @@ export async function runStyleFlow(styleId: string, buttonName: string, stepIds:
     const after = m.patternSizeCm
     if (Math.abs(after.x - before.x) > 0.01 || Math.abs(after.y - before.y) > 0.01) resized++
     await i.pinch("MinusButton")
+    const mi = m.measureIndex
     await i.pinch("NextMeasurementButton")
+    if (m.phase === "measure" && m.measureIndex === mi) print(`ChalkLessTest: ${styleId} Next did not advance at measurement ${k} (${keys[k]})`)
   }
   print(`ChalkLessTest: ${styleId} ${keys.length} measurements, ${resized} resize the pattern`)
   expect(resized).toBeGreaterThan(0)

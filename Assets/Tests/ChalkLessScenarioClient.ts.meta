@@ -47,4 +47,4 @@
       {}
   InputLines:
     - '// @input string only {"hint":"Only run the scenario with this id (empty = all)"}'
-    - '// @input bool runOnStart {"hint":"Run all LEAF scenarios when the Lens starts (turn on to test)"}'
+    - '// @input bool runOnStart = true {"hint":"Run all LEAF scenarios when the Lens starts (turn on to test)"}'
