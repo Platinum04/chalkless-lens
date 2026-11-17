@@ -58,8 +58,8 @@ export class ChalkLessMain extends BaseScriptComponent {
   @ui.separator
   @ui.group_start("Debug")
   @input
-  @hint("Jump straight to a cutting step at launch for review (-1 = normal start at the menu, 0..6 = step, 7 = summary)")
-  @widget(new SliderWidget(-1, 7, 1))
+  @hint("Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0..6 = cutting step, 7 = summary")
+  @widget(new SliderWidget(-3, 7, 1))
   debugJumpToStep: number = -1
   @ui.group_end
 
@@ -101,7 +101,10 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.stepPanel.onNext.add(() => this.next())
     this.summary.onRestart.add(() => this.restart())
     this.restart()
-    if (this.debugJumpToStep >= 0) {
+    const j = this.debugJumpToStep
+    if (j === -3 || j === -2) this.chooseBuba()
+    if (j === -2) this.placePattern()
+    if (j >= 0) {
       this.chooseBuba()
       this.placePattern()
       this.startCutting()

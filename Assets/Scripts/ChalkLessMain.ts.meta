@@ -83,5 +83,5 @@
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Debug"}'
-    - '// @input float debugJumpToStep = -1 {"hint":"Jump straight to a cutting step at launch for review (-1 = normal start at the menu, 0..6 = step, 7 = summary)", "widget":"slider", "min":-1, "max":7, "step":1}'
+    - '// @input float debugJumpToStep = -1 {"hint":"Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0..6 = cutting step, 7 = summary", "widget":"slider", "min":-3, "max":7, "step":1}'
     - '// @ui {"widget":"group_end"}'
