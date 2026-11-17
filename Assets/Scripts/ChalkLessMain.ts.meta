@@ -35,6 +35,7 @@
     debugMaxMeasurements: false
     debugStyleId: false
     fabric: false
+    fabricFinder: false
     garmentMenu: false
     measurePad: false
     pattern: false
@@ -44,6 +45,7 @@
     stepPanelX: false
     summary: false
     summaryMeasureCount: false
+    tableFinder: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -59,6 +61,8 @@
       stepPanel: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
       summary: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
       fabric: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      tableFinder: !<MappingBased.AssignableType_6> 00000000-0000-0000-0000-000000000000
+      fabricFinder: !<MappingBased.AssignableType_7> 00000000-0000-0000-0000-000000000000
       stepCm: !<float> 1.000000
       bigStepCm: !<float> 5.000000
       summaryMeasureCount: !<float> 4.000000
@@ -81,6 +85,8 @@
     - '// @input AssignableType_4 stepPanel {"hint":"Step label + Next panel lying on the fabric"}'
     - '// @input AssignableType_5 summary {"hint":"Summary card at the far edge of the table"}'
     - '// @input SceneObject fabric {"hint":"Fabric SceneObject (top surface centre)"}'
+    - '// @input AssignableType_6 tableFinder {"hint":"Optional: World Query table finder (first start only; preview falls back to the stand-in)"}'
+    - '// @input AssignableType_7 fabricFinder {"hint":"Optional: camera fabric finder (runs after the table is confirmed)"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'

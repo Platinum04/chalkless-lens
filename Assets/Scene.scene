@@ -483,6 +483,29 @@
     - !<own> a6af4948-9adc-4052-ae22-db902dd2764e
   Components:
     []
+- !<ScriptComponent/15978a57-f0b3-46d7-8217-f8ccc28d2ea2>
+  PrefabRemaps:
+    []
+  Name: ChalkLessFabricFinder
+  Enabled: true
+  ScriptAsset: !<reference> 1cf7c9d3-5c45-4ce6-85ba-867eb11c2c43
+  ScriptInputsDefault:
+    workWidthPx: true
+    minColourDiff: true
+    timeoutSec: true
+    detectInPreview: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      head: !<reference.SceneObject> 00000000-0000-0065-0000-000000000064
+      workWidthPx: !<float> 128.000000
+      minColourDiff: !<float> 30.000000
+      timeoutSec: !<float> 5.000000
+      detectInPreview: false
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/181c239f-175e-4912-94fc-d37a2599b2d6>
   PrefabRemaps:
     []
@@ -498,6 +521,37 @@
     []
   Components:
     []
+- !<ScriptComponent/1e9963e5-9631-4539-9e36-a76b04fb8cf1>
+  PrefabRemaps:
+    []
+  Name: ChalkLessTableFinder
+  Enabled: true
+  ScriptAsset: !<reference> 97329a61-e744-4924-ba96-f16d9fa47631
+  ScriptInputsDefault:
+    maxTiltDeg: true
+    minDropCm: true
+    maxDropCm: true
+    skipAfterSec: true
+    reticleColor: true
+    reticleRadiusCm: true
+    detectInPreview: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      ui: !<MappingBased.AssignableType_1> d1ee3d1e-4e79-4111-9e86-8431e2868bb7
+      head: !<reference.SceneObject> 00000000-0000-0065-0000-000000000064
+      reticleMaterial: !<reference.Material> 087da98b-5989-484d-b6b2-db071dea8690
+      maxTiltDeg: !<float> 15.000000
+      minDropCm: !<float> 50.000000
+      maxDropCm: !<float> 110.000000
+      skipAfterSec: !<float> 4.000000
+      reticleColor: !<Vec4> {x: 0.550000, y: 1.000000, z: 0.900000, w: 1.000000}
+      reticleRadiusCm: !<float> 12.000000
+      detectInPreview: false
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/1f2b3410-a393-4b70-b150-eb1145423cb3>
   PrefabRemaps:
     []
@@ -947,6 +1001,22 @@
     - !<own> 8fe2a532-9bf3-4cde-b598-04ce5470718d
   Components:
     []
+- !<SceneObject/470f3f67-e95e-4de0-9cd5-f09a7a0eb331>
+  PrefabRemaps:
+    []
+  Name: Detection
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 1e9963e5-9631-4539-9e36-a76b04fb8cf1
+    - !<own> 15978a57-f0b3-46d7-8217-f8ccc28d2ea2
 - !<ScriptComponent/4765b014-93b9-4dfb-a66d-9e6edf84e143>
   PrefabRemaps:
     []
@@ -1187,6 +1257,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/6377db85-2dc0-4f30-9aa6-ca74c415b3ff>
+  PrefabRemaps:
+    []
+  Name: TableFinderPanel
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -38.000000, z: -95.000000}
+    Rotation: {x: -20.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> d1ee3d1e-4e79-4111-9e86-8431e2868bb7
 - !<ScriptComponent/64f27597-c99d-4c59-8a08-05459cc2258d>
   PrefabRemaps:
     []
@@ -1344,6 +1429,7 @@
     - !<own> d4b1d089-cdfe-4fc1-ae63-8113072ec1ca
     - !<own> 224e6f73-5fa1-4e34-800e-25559c60c451
     - !<own> 9d358cd6-5fc2-46fe-bb5e-18ca54433972
+    - !<own> 470f3f67-e95e-4de0-9cd5-f09a7a0eb331
   Components:
     - !<own> feafb83e-da84-45aa-bebd-da32928164e7
 - !<SceneObject/74d13517-1dbf-42e6-b536-27afc4909c65>
@@ -1776,6 +1862,7 @@
     - !<own> d0a4a4fe-7dad-4262-aba2-4bf0ea6622a6
     - !<own> 31230379-f9d2-4fc7-b3f9-94dee9ee4761
     - !<own> d6b1856e-9649-409e-890b-866140448f55
+    - !<own> 6377db85-2dc0-4f30-9aa6-ca74c415b3ff
   Components:
     []
 - !<SceneObject/9e373d68-993f-4c8f-83a0-6644f1d9fefd>
@@ -2318,6 +2405,26 @@
     []
   Components:
     - !<own> 54b0f5c8-1c8d-43e8-bcc6-9680fcbaef90
+- !<ScriptComponent/d1ee3d1e-4e79-4111-9e86-8431e2868bb7>
+  PrefabRemaps:
+    []
+  Name: ChalkLessTableFinderUI
+  Enabled: true
+  ScriptAsset: !<reference> 86daa8b6-1c76-48ae-b1a5-a5752a3cded7
+  ScriptInputsDefault:
+    panelWidth: true
+    viewDistance: true
+    prompt: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      panelWidth: !<float> 34.000000
+      viewDistance: !<float> 110.000000
+      prompt: Look at your cutting table and pinch Confirm
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/d3e2f3da-623a-41ce-a191-f1a958b2c5a2>
   PrefabRemaps:
     []
@@ -2861,6 +2968,8 @@
       stepPanel: !<MappingBased.AssignableType_4> 4765b014-93b9-4dfb-a66d-9e6edf84e143
       summary: !<MappingBased.AssignableType_5> 0e0a73ab-83e3-4b14-9b4b-1279d15b5cc2
       fabric: !<reference.SceneObject> 57b5016b-d259-42d4-87b9-00493b74c745
+      tableFinder: !<MappingBased.AssignableType_6> 1e9963e5-9631-4539-9e36-a76b04fb8cf1
+      fabricFinder: !<MappingBased.AssignableType_7> 15978a57-f0b3-46d7-8217-f8ccc28d2ea2
       stepCm: !<float> 1.000000
       bigStepCm: !<float> 5.000000
       summaryMeasureCount: !<float> 4.000000

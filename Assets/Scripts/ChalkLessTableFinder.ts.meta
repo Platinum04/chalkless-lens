@@ -1,0 +1,84 @@
+- !<AssetImportMetadata/8f3ffbc0-586d-4ce7-b57e-acc550135391>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 97329a61-e744-4924-ba96-f16d9fa47631
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 97329a61-e744-4924-ba96-f16d9fa47631
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> e984088b-eb52-48b6-a66c-7f907e2bab9b
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/e984088b-eb52-48b6-a66c-7f907e2bab9b>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 6de7a7d4-cc21-443a-8c66-895a1f280a26
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    detectInPreview: false
+    head: false
+    maxDropCm: false
+    maxTiltDeg: false
+    minDropCm: false
+    reticleColor: false
+    reticleMaterial: false
+    reticleRadiusCm: false
+    skipAfterSec: false
+    ui: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - ui: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      head: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      reticleMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      maxTiltDeg: !<float> 15.000000
+      minDropCm: !<float> 50.000000
+      maxDropCm: !<float> 110.000000
+      skipAfterSec: !<float> 4.000000
+      reticleColor: !<Vec4> {x: 0.550000, y: 1.000000, z: 0.900000, w: 1.000000}
+      reticleRadiusCm: !<float> 12.000000
+      detectInPreview: false
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessTableFinder – World Query table detection</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"References"}'
+    - '// @input AssignableType_1 ui {"hint":"Find-your-table prompt panel"}'
+    - '// @input SceneObject head {"hint":"Camera SceneObject (eye position and gaze ray)"}'
+    - '// @input Asset.Material reticleMaterial {"hint":"Unlit material cloned for the reticle ring"}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float maxTiltDeg = 15 {"hint":"Max tilt of the surface from level (degrees)", "widget":"slider", "min":5, "max":30, "step":1}'
+    - '// @input float minDropCm = 50 {"hint":"Table top must be at least this far below the eye (cm)", "widget":"slider", "min":20, "max":100, "step":1}'
+    - '// @input float maxDropCm = 110 {"hint":"Table top must be at most this far below the eye (cm)", "widget":"slider", "min":60, "max":160, "step":1}'
+    - '// @input float skipAfterSec = 4 {"hint":"Seconds without a table hit before the Use virtual table button appears", "widget":"slider", "min":1, "max":15, "step":0.5}'
+    - '// @input vec4 reticleColor = "{0.55, 1, 0.9, 1}" {"hint":"Reticle colour (light: additive display)", "widget":"color"}'
+    - '// @input float reticleRadiusCm = 12 {"hint":"Reticle ring radius (cm)", "widget":"slider", "min":3, "max":30, "step":1}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Debug"}'
+    - '// @input bool detectInPreview {"hint":"Also try World Query in the Lens Studio preview (normally the preview skips straight to the stand-in)"}'
+    - '// @ui {"widget":"group_end"}'

@@ -20,6 +20,8 @@ import {G6ALineDress} from "./G6ALineDress"
 import {G7SheathDress} from "./G7SheathDress"
 import {G8WrapDress} from "./G8WrapDress"
 import {G9MaxiGown} from "./G9MaxiGown"
+import {D1DetectionFallback} from "./D1DetectionFallback"
+import {D2FabricSegmentation} from "./D2FabricSegmentation"
 
 @component
 export class LeafIndex extends BaseScriptComponent {
@@ -45,5 +47,7 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "g7-sheath-dress", typename: G7SheathDress.getTypeName()},
     {id: "g8-wrap-dress", typename: G8WrapDress.getTypeName()},
     {id: "g9-maxi-gown", typename: G9MaxiGown.getTypeName()},
+    {id: "d1-detection-fallback", typename: D1DetectionFallback.getTypeName()},
+    {id: "d2-fabric-segmentation", typename: D2FabricSegmentation.getTypeName()},
   ]
 }

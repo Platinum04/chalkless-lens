@@ -1,0 +1,57 @@
+- !<AssetImportMetadata/d83b460a-53ff-4bb0-8f97-9e8d13f99dcd>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 86daa8b6-1c76-48ae-b1a5-a5752a3cded7
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 86daa8b6-1c76-48ae-b1a5-a5752a3cded7
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 6ad07692-1b2f-4bc6-92a7-f6bfc00b3e10
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/6ad07692-1b2f-4bc6-92a7-f6bfc00b3e10>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 3db377f9-ca10-4e9c-a1ea-d0249f110265
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    panelWidth: false
+    prompt: false
+    viewDistance: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - panelWidth: !<float> 34.000000
+      viewDistance: !<float> 110.000000
+      prompt: Look at your cutting table and pinch Confirm
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessTableFinderUI – find your table prompt</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float panelWidth = 34 {"hint":"Panel width in cm", "widget":"slider", "min":20, "max":60, "step":1}'
+    - '// @input float viewDistance = 110 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
+    - '// @input string prompt = "Look at your cutting table and pinch Confirm" {"hint":"Prompt shown while looking for the table"}'
+    - '// @ui {"widget":"group_end"}'

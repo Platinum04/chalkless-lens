@@ -15,8 +15,10 @@ import {ChalkLessSummaryUI} from "./ChalkLessSummaryUI"
 import {BUBA, defaultsOf, fabricSavedEstimate, Measurements, PatternGeometry, StyleRecipe} from "./ChalkLessPattern"
 import {findStyle} from "./ChalkLessStyleRecipes"
 import {ChalkLessWorkTable} from "./ChalkLessWorkTable"
+import {ChalkLessTableFinder, TableSurface} from "./ChalkLessTableFinder"
+import {ChalkLessFabricFinder, FabricRect} from "./ChalkLessFabricFinder"
 
-export type Phase = "menu" | "measure" | "align" | "cutting" | "done"
+export type Phase = "findTable" | "menu" | "measure" | "align" | "cutting" | "done"
 
 @component
 export class ChalkLessMain extends BaseScriptComponent {
@@ -41,6 +43,14 @@ export class ChalkLessMain extends BaseScriptComponent {
   @input
   @hint("Fabric SceneObject (top surface centre)")
   fabric: SceneObject
+  @input
+  @hint("Optional: World Query table finder (first start only; preview falls back to the stand-in)")
+  @allowUndefined
+  tableFinder: ChalkLessTableFinder
+  @input
+  @hint("Optional: camera fabric finder (runs after the table is confirmed)")
+  @allowUndefined
+  fabricFinder: ChalkLessFabricFinder
   @ui.group_end
   @ui.separator
   @ui.group_start("Settings")
@@ -140,6 +150,11 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.stepPanel.onNext.add(() => this.next())
     this.summary.onRestart.add(() => this.restart())
     this.restart()
+    // First start only: find the real table (device). Preview falls back at once, so this stays on "menu".
+    if (this.tableFinder && this.debugJumpToStep === -1) {
+      this.findTable(false)
+      return
+    }
     const j = this.debugJumpToStep
     const sid = this.debugStyleId || "buba"
     if (j === -3 || j === -2) this.chooseMaybeMax(sid)
@@ -158,6 +173,52 @@ export class ChalkLessMain extends BaseScriptComponent {
     for (const d of this.recipe.measurements) this.measurements[d.key] = d.maxCm
     this.refreshGeometry()
     this.pushMeasurement()
+  }
+
+  /** True once the table phase has finished (confirmed, skipped or fell back). */
+  tableReady = false
+  /** Fabric rectangle from the camera, or null when aligning by hand. */
+  detectedFabric: FabricRect | null = null
+
+  /** "Find your table" phase. forceUi shows the prompt even where World Query can't run (tests, re-locate). */
+  findTable(forceUi = true): void {
+    if (!this.tableFinder) return
+    this.phase = "findTable"
+    this.garmentMenu.hide()
+    this.tableFinder.begin((s) => this.onTableFound(s), forceUi)
+  }
+
+  private onTableFound(s: TableSurface | null): void {
+    this.tableReady = true
+    if (s) this.moveWorkAreaTo(s.position)
+    this.restart()
+    if (!this.fabricFinder) return
+    const y = this.fabric.getTransform().getWorldPosition().y
+    if (s) this.fabricFinder.run(y, (r) => this.applyDetectedFabric(r))
+    else print("ChalkLess: fabric detection unavailable, align by hand")
+  }
+
+  /** Translate the whole work area (stand-in, fabric, pattern, panels) so the fabric top sits on the hit point. */
+  private moveWorkAreaTo(hit: vec3): void {
+    const f = this.fabric.getTransform().getWorldPosition()
+    const tr = this.getSceneObject().getTransform()
+    tr.setWorldPosition(tr.getWorldPosition().add(hit.sub(f)))
+    print(`ChalkLess: work area moved onto the table (${hit.x.toFixed(0)}, ${hit.y.toFixed(0)}, ${hit.z.toFixed(0)})`)
+  }
+
+  /** Detected cloth: centre the fabric on it, use its size, and start the pattern flush with its fold (left) edge. */
+  applyDetectedFabric(r: FabricRect | null): void {
+    this.detectedFabric = r
+    if (!r) return
+    const ft = this.fabric.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable
+    const tr = this.fabric.getTransform()
+    const f = tr.getWorldPosition()
+    tr.setWorldPosition(new vec3(r.center.x, f.y, r.center.z))
+    this.baseFabric = new vec3(Math.round(r.sizeCm.x), ft ? ft.currentSize.y : 0.4, Math.round(r.sizeCm.y))
+    // fitFabric clamps the offset to the fabric, so a large negative X lands the pattern on the left (fold) edge.
+    this.patternStartOffset = new vec2(-999, 0)
+    this.fitFabric()
+    print(`ChalkLess: pattern snapped to fabric edge (yaw ${r.yawDeg.toFixed(1)} deg; rotate by hand if needed)`)
   }
 
   restart(): void {
