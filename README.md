@@ -6,6 +6,7 @@ The tailor picks a style, enters the client's measurements, and the glasses lay 
 
 ## How it works
 
+0. **Find the table and the fabric.** When the tailor puts on the glasses, ChalkLess finds the flat cutting-table surface and then the edges of the fabric lying on it, so the pattern can snap to the cloth. (In progress; see the pipeline below.)
 1. **Choose a style.** Pinch a garment on the menu floating above the table.
 2. **Enter measurements.** Set the standard tailor measurements one at a time with big − / + buttons: neck, shoulder, chest, top length, sleeve length, round sleeve, hip. A mini preview of the pattern resizes as you go.
 3. **Place the pattern.** The pattern appears at real size on the fabric. Pinch-drag it to line it up with the fabric edge, then press **Start cutting**.
@@ -38,6 +39,18 @@ The tailor picks a style, enters the client's measurements, and the glasses lay 
 
 All styles work in the preview. Each style is a pattern recipe: it builds the pattern pieces from the measurements and sets the order of the cuts. The fabric can be anything: ankara, aso-oke, lace, suit cloth or kaftan fabric.
 
+## Table and fabric detection pipeline
+
+| Stage | How it works on Specs | Status |
+|---|---|---|
+| 1. Find the table | **World Query** hit-tests where the tailor is looking and returns a flat, roughly horizontal surface with its height and orientation. The tailor confirms it with a pinch, and ChalkLess anchors the work area there. | Planned next |
+| 2. Find the fabric | The **Camera Module** captures a frame of the table. Image processing separates the cloth from the tabletop by colour and texture, finds its four edges and corners, and projects them onto the table plane using the camera's intrinsics and depth. | Planned next |
+| 3. Snap the pattern | The pattern lines up with the detected fabric edge (the straight grain and the fold side), and the fabric size limits where the pieces can go. | Planned next |
+| 4. Manual fallback | If detection fails (busy prints like ankara, poor light, lace), the tailor pinch-drags the pattern onto the fabric. This works today. | ✅ Working |
+
+- **In the Lens Studio preview,** a virtual table and fabric stand in for the real ones, so the full flow can be demoed and tested.
+- **On real glasses,** detection runs first and falls back to the manual drag if it fails.
+
 ## Running it
 
 - **Open:** `chalkless-lens.esproj` in **Lens Studio 5.25+**, with the Specs target.
@@ -56,6 +69,6 @@ All styles work in the preview. Each style is a pattern recipe: it builds the pa
 - Proven in the Lens Studio preview. Not yet tested on a Specs device.
 - Voice "next" is planned; the Next button covers it.
 - The fabric-saved figure is an estimate.
-- Real table and fabric detection is out of scope for now.
+- Real table and fabric detection is being built (see the pipeline above). Until then, the tailor aligns the pattern by hand.
 
 Built for the Learn AR with SPECS hackathon.

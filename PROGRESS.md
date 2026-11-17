@@ -32,6 +32,12 @@
 - Not eyeballed yet: hover highlight; Kaftan short, Dashiki, A-line, Sheath captures
 - Devpost story: real Specs = World Query surface hit test finds the table; fabric edge recognition is roadmap (camera + CV); today the tailor pinch-drags to align
 
+## Table + fabric detection (user priority, added 2026-11-17; build right after UX phase)
+- Table: World Query hit test → horizontal plane → pinch to confirm → anchor table/work area (replace stand-in on device; keep stand-in in preview)
+- Fabric: Camera Module frame → segment cloth vs table (colour/texture) → 4 edges/corners → unproject to table plane (intrinsics + depth) → snap pattern to fabric edge/fold
+- Fallback: manual pinch-drag (works today). Preview: stand-in table/fabric
+- Risk: fabric detection can only be partly verified in preview (no real camera feed); must say so in Devpost
+
 ## Agreed plan (2026-11-17) — FEATURE FREEZE now
 1. Voice "next": optional, off by default; Next button carries the demo
 2. Make it solid: faint buttons, labels running past pieces, big lays fitting the table (suit 197x146, maxi 208x80); re-run all 20 tests after every change
