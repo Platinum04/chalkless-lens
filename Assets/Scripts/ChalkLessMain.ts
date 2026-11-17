@@ -333,6 +333,13 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.showStep()
   }
 
+  /** Voice "back": revisit the previous step without leaving the cutting phase. */
+  previous(): void {
+    if (this.phase !== "cutting" || this.currentStep <= 0) return
+    this.currentStep--
+    this.showStep()
+  }
+
   private showStep(): void {
     const st = this.geometry.steps[this.currentStep]
     const steps = this.recipe.steps

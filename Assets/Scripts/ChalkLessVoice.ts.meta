@@ -1,0 +1,53 @@
+- !<AssetImportMetadata/90c0f141-6b4a-4a70-be21-dbab55cdf986>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> fd2784e8-34e2-4d67-a3d6-e3fdfa2e429a
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> fd2784e8-34e2-4d67-a3d6-e3fdfa2e429a
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> a052b201-b591-4008-a375-ffe631083682
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/a052b201-b591-4008-a375-ffe631083682>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 1c8e5ee9-43d6-459f-998a-66c8054fa2ee
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    enabled: false
+    logTranscripts: false
+    main: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - main: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      enabled: true
+      logTranscripts: false
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input AssignableType_1 main {"hint":"ChalkLess flow controller"}'
+    - '// @input bool enabled = true {"hint":"Enable voice commands while cutting"}'
+    - '// @input bool logTranscripts {"hint":"Print final transcripts for voice debugging"}'
