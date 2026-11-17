@@ -23,3 +23,6 @@ Packages/AiPreviewAgentInspect.lspkg*
 
 # Added by Lens Studio (LEAF plugin)
 leaf_plugin_settings.json
+
+# Lens Studio removes .agents/ on every project load (Agents-Docs legacyCleanup); skills live in .claude/skills
+.agents/

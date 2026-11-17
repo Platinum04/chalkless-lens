@@ -2,7 +2,7 @@
 status: approved
 ---
 
-# Design brief: ChalkLess — cut right the first time
+# Design brief: ChalkLess, cut right the first time
 
 ## The one spatial moment
 A tailor stands at the cutting table with scissors in hand. The full-size buba pattern lies on the fabric. Only the next line to cut glows, with a short label and arrows, so the tailor cuts with both hands free and eyes on the cloth.
@@ -21,7 +21,7 @@ A tailor stands at the cutting table with scissors in hand. The full-size buba p
 - Garment menu: a small panel floating just above the far edge of the table, facing the user, about 30 cm wide (default). Buba is active; wrapper skirt and kaftan are greyed placeholders that say "Coming soon".
 - Measurement pad: same spot as the menu, after Buba is chosen. The standard tailor measurements for a buba, shown one at a time with big − / + buttons and a big "Next measurement" button: neck, shoulder, chest, top length, sleeve length, round sleeve (arm), hip. Steps of 1 cm (default). Start values (default): neck 40, shoulder 46, chest 100, top length 70, sleeve length 25, round sleeve 36, hip 104 cm. A small live preview of the pattern resizes as values change.
 - Pattern: lies flat on the fabric at real size, built from the measurements (front piece on the fold, plus sleeve).
-- Step label: flat on the fabric right beside the current line, large light text, one short line, e.g. "Cut neckline — 12 cm curve".
+- Step label: flat on the fabric right beside the current line, large light text, one short line, e.g. "Cut neckline: 12 cm curve".
 - Summary card: stands up at the far edge of the table when all cuts are done.
 
 ## Hands and input
