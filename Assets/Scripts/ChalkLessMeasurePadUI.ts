@@ -108,15 +108,16 @@ export class ChalkLessMeasurePadUI extends BaseScriptComponent {
     if (this.lineMaterial) this.previewRmv.mainMaterial = tintedMaterial(this.lineMaterial, this.previewColor)
   }
 
-  setMeasurement(name: string, valueCm: number, index: number, total: number, isLast: boolean): void {
-    this.stepText.text = `Buba measurement ${index + 1} of ${total}`
+  setMeasurement(name: string, valueCm: number, index: number, total: number, isLast: boolean, styleName: string = "Buba"): void {
+    this.stepText.text = `${styleName} measurement ${index + 1} of ${total}`
     this.nameText.text = name
     this.valueText.text = `${valueCm} cm`
     this.nextBtn.label.text = isLast ? "Place pattern" : "Next measurement"
   }
 
   setMiniPreview(g: PatternGeometry): void {
-    const s = this.previewScale
+    // Fixed scale so changes are visible; shrink only when a long/wide style would overflow the 15 cm box.
+    const s = Math.min(this.previewScale, 14.5 / Math.max(1, g.lengthCm), (this.panelWidth - 5) / Math.max(1, g.widthCm))
     const acc = new MeshAccumulator(0)
     const ox = -g.widthCm / 2
     const oz = -g.lengthCm / 2

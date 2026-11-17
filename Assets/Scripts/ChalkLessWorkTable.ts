@@ -32,16 +32,36 @@ export class ChalkLessWorkTable extends BaseScriptComponent {
   legLength: number = 86
   @ui.group_end
 
+  private parts: SceneObject[] = []
+
+  /** Current slab size (cm). */
+  get currentSize(): vec3 {
+    return this.size
+  }
+
   onAwake(): void {
+    this.build()
+  }
+
+  /** Rebuild the slab at a new size (used to grow the fabric stand-in for big styles like agbada). */
+  resize(size: vec3): void {
+    if (size.equal(this.size) && this.parts.length > 0) return
+    this.size = size
+    this.build()
+  }
+
+  private build(): void {
+    for (const p of this.parts) p.destroy()
+    this.parts = []
     const mat = tintedMaterial(this.material, this.color)
     const s = this.size
-    meshObject(this.sceneObject, "Slab", boxMesh(new vec3(0, -s.y / 2, 0), s), mat)
+    this.parts.push(meshObject(this.sceneObject, "Slab", boxMesh(new vec3(0, -s.y / 2, 0), s), mat).getSceneObject())
     if (this.withLegs) {
       const lm = tintedMaterial(this.material, new vec4(this.color.x * 0.8, this.color.y * 0.8, this.color.z * 0.8, 1))
       for (const sx of [-1, 1]) {
         for (const sz of [-1, 1]) {
           const c = new vec3(sx * (s.x / 2 - 5), -s.y - this.legLength / 2, sz * (s.z / 2 - 5))
-          meshObject(this.sceneObject, "Leg", boxMesh(c, new vec3(5, this.legLength, 5)), lm)
+          this.parts.push(meshObject(this.sceneObject, "Leg", boxMesh(c, new vec3(5, this.legLength, 5)), lm).getSceneObject())
         }
       }
     }

@@ -248,7 +248,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     t.layoutRect = Rect.create(vertical ? 0 : -16, vertical ? 30 : 16, -1.6, 1.6)
   }
 
-  /** -1 = aligning (whole outline shown); 0..6 = cutting; 7 = all done. */
+  /** -1 = aligning (whole outline shown); 0..n-1 = cutting; n = all done. */
   setCurrentStep(i: number): void {
     this.currentStep = i
     this.states = []
@@ -292,14 +292,21 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     const off = -8 // inward: the free fabric inside the piece, right beside the line
     let lx = mid[0] + (dx / l) * off - g.widthCm / 2
     let lz = mid[1] + (dz / l) * off - g.lengthCm / 2
-    if (i === 0) {
-      // fold: lay the label inside the front piece, beside the fold line
-      lx = 3 - g.widthCm / 2
-      lz = mid[1] - g.lengthCm / 2
+    const isFold = st.id === "fold" || (st.id === undefined && i === 0)
+    const foldVertical = isFold && Math.abs(pts[pts.length - 1][0] - pts[0][0]) < 0.01
+    if (isFold) {
+      // fold: lay the label inside the piece, beside the fold line
+      if (foldVertical) {
+        lx = pts[0][0] + 3 - g.widthCm / 2
+        lz = mid[1] - g.lengthCm / 2
+      } else {
+        lx = mid[0] - g.widthCm / 2
+        lz = pts[0][1] + 4 - g.lengthCm / 2
+      }
     }
     so.getTransform().setLocalPosition(new vec3(lx, 0.4, lz))
     const t = this.activeLabel
-    const side = i === 0 ? -1 : Math.abs(dx / l) > 0.5 ? Math.sign(dx) : 0
+    const side = foldVertical ? -1 : isFold ? 0 : Math.abs(dx / l) > 0.5 ? Math.sign(dx) : 0
     if (side > 0) {
       t.horizontalAlignment = HorizontalAlignment.Right
       t.layoutRect = Rect.create(-45, 0, -2, 2)
