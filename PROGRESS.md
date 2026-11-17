@@ -18,9 +18,10 @@
 - All styles added (2026-11-17): Kaftan long/short sleeve, Agbada, Dashiki, ladies' corset (6 panels), wrapper skirt. Recipes in Assets/Scripts/ChalkLessStyleRecipes.ts; fabric stand-in grows for big lays (Agbada 155x104, long Kaftan 150x110)
 - Chest and sleeve length now change the Buba outline (default 65x70 cm)
 - LEAF re-run after styles: all 5 PASS in Preview 1 and Headless (C3 drag made longer/slower; it was flaky in headless)
+- LEAF style tests S1–S6 (Kaftan long/short, Agbada, Dashiki, Corset, Wrapper): full flow with real pinches — all 11 tests PASS in Preview 1 and Headless (2026-11-17)
 
 ## Next
-- LEAF tests for the new styles (only Buba is covered)
+- Global styles: suit, blazer, joggers, palazzo, bubu, more ladies' dresses
 - Polish: long labels run past their piece (Kaftan sleeve, wrapper waistband)
 - Voice "next" (not built; Next button covers it)
 - Demo video plan (<3 min); make repo public or share with Devpost before Dec 5
