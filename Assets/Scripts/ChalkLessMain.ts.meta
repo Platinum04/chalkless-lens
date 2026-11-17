@@ -85,6 +85,6 @@
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Debug"}'
-    - '// @input float debugJumpToStep = -1 {"hint":"Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0.. = cutting step, last+1 = summary", "widget":"slider", "min":-3, "max":8, "step":1}'
-    - '// @input string debugStyleId = "buba" {"hint":"Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper"}'
+    - '// @input float debugJumpToStep = -1 {"hint":"Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0.. = cutting step, last+1 = summary", "widget":"slider", "min":-3, "max":12, "step":1}'
+    - '// @input string debugStyleId = "buba" {"hint":"Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper, suit, blazer, joggers, palazzo, bubu, aLineDress, sheathDress, wrapDress, maxiGown"}'
     - '// @ui {"widget":"group_end"}'

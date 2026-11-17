@@ -63,10 +63,10 @@ export class ChalkLessMain extends BaseScriptComponent {
   @ui.group_start("Debug")
   @input
   @hint("Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0.. = cutting step, last+1 = summary")
-  @widget(new SliderWidget(-3, 8, 1))
+  @widget(new SliderWidget(-3, 12, 1))
   debugJumpToStep: number = -1
   @input
-  @hint("Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper")
+  @hint("Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper, suit, blazer, joggers, palazzo, bubu, aLineDress, sheathDress, wrapDress, maxiGown")
   debugStyleId: string = "buba"
   @ui.group_end
 

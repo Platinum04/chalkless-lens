@@ -32,6 +32,7 @@
     buttonHeight: false
     panelWidth: false
     title: false
+    title2: false
     titleColor: false
     viewDistance: false
   ScriptTypesHidden:
@@ -48,6 +49,7 @@
       title: ChalkLess — choose a garment
       buttonHeight: 5.500000
       titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
+      title2: "More styles — suits, trousers, dresses"
   ScriptTypes:
     -
       {}
@@ -60,4 +62,5 @@
     - '// @input string title = "ChalkLess — choose a garment" {"hint":"Menu title"}'
     - '// @input float buttonHeight = 5.5 {"hint":"Height of each style button (cm)", "widget":"slider", "min":4, "max":9, "step":0.5}'
     - '// @input vec4 titleColor = "{0.85, 0.95, 1, 1}" {"hint":"Title text colour (keep light — additive display)", "widget":"color"}'
+    - '// @input string title2 = "More styles — global" {"hint":"Title on page 2 (global styles)"}'
     - '// @ui {"widget":"group_end"}'

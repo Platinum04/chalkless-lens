@@ -262,6 +262,7 @@
       title: ChalkLess — choose a garment
       buttonHeight: 5.500000
       titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
+      title2: More styles — global
   ScriptTypes:
     "":
       {}

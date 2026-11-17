@@ -27,6 +27,7 @@ import {
   StepGeometry,
   StyleRecipe,
 } from "./ChalkLessPattern"
+import {GLOBAL_STYLES} from "./ChalkLessGlobalRecipes"
 
 const def = (key: string, label: string, d: number, min: number, max: number): MeasurementDef => ({key, label, defaultCm: d, minCm: min, maxCm: max})
 const fold = (len: number, c: P2, label: string): StepGeometry => ({id: "fold", lines: [[[0, -2], [0, len + 2]]], closed: false, centroid: c, marks: [], label})
@@ -506,8 +507,12 @@ const WRAPPER: StyleRecipe = {
   chalkLayoutAreaCm2: (g, mm) => chalkAreaColumns(g, mm, 1),
 }
 
-/** Menu order. */
-export const STYLES: StyleRecipe[] = [BUBA, kaftan(true), kaftan(false), AGBADA, DASHIKI, CORSET, WRAPPER]
+/** Menu page 1 (original styles, order and button names unchanged). */
+export const PAGE1_STYLES: StyleRecipe[] = [BUBA, kaftan(true), kaftan(false), AGBADA, DASHIKI, CORSET, WRAPPER]
+/** Menu page 2: global styles (ChalkLessGlobalRecipes). */
+export const PAGE2_STYLES: StyleRecipe[] = GLOBAL_STYLES
+/** Every style, menu order. */
+export const STYLES: StyleRecipe[] = [...PAGE1_STYLES, ...PAGE2_STYLES]
 
 export function findStyle(id: string): StyleRecipe | undefined {
   for (const s of STYLES) if (s.id === id) return s
