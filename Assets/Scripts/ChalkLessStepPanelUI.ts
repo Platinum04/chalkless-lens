@@ -65,6 +65,9 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
     })
     this.counter = textRow(content, "StepCounter", "Align pattern", "Headline1", d, inner, 3.5, new vec4(0.8, 0.85, 0.9, 1))
     this.label = textRow(content, "StepLabel", this.alignText, "Title2", d, inner, 10, this.labelColor)
+    // Long labels shrink to fit the panel instead of spilling past it.
+    this.label.verticalOverflow = VerticalOverflow.Shrink
+    this.counter.horizontalOverflow = HorizontalOverflow.Shrink
     this.action = labeledButton(content, "StepActionButton", "Start cutting", inner, 8, d, "Title2")
     this.action.button.onTriggerUp.add(() => this.pressAction())
   }

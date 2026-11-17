@@ -10,8 +10,21 @@
 import {Interactable} from "InteractionKit.lspkg/Components/Interaction/Interactable/Interactable"
 import {InteractableManipulation} from "InteractionKit.lspkg/Components/Interaction/InteractableManipulation/InteractableManipulation"
 import {MeshAccumulator, tintedMaterial} from "./ChalkLessLines"
-import {offsetOutward, P2, PatternGeometry} from "./ChalkLessPattern"
+import {offsetOutward, P2, PatternGeometry, shownLaySize} from "./ChalkLessPattern"
 import {applyTextRole} from "./ChalkLessStyleUI"
+
+/** Text heights (cm) lying on the fabric; text size per cm calibrated in the preview. */
+const ACTIVE_TEXT_H_CM = 3
+const MARK_TEXT_H_CM = 2.2
+const ACTIVE_LABEL_MAX_W_CM = 44
+const SIZE_PER_CM = 55
+const CHAR_W = 0.56 // average glyph width / text height (bold sans)
+function textSizeForHeight(hCm: number): number {
+  return hCm * SIZE_PER_CM
+}
+function textWidthCm(s: string, hCm: number): number {
+  return s.length * hCm * CHAR_W
+}
 
 export type LineState = "align" | "active" | "done" | "future"
 
@@ -100,6 +113,33 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     return this.draggable
   }
 
+  /** Size (cm) of the lay shown on the fabric at once — the largest group for big styles split into groups. */
+  get laySizeCm(): vec2 {
+    if (!this.geometry) return vec2.zero()
+    const s = shownLaySize(this.geometry)
+    return new vec2(s[0], s[1])
+  }
+
+  /** Group shown now: the current step's group (first group while aligning, last group when done). */
+  private activeGroup(): number {
+    const g = this.geometry
+    if (!g || !g.groups) return 0
+    const i = this.currentStep
+    if (i < 0) return 0
+    if (i >= g.steps.length) return g.groups.length - 1
+    return g.steps[i].group || 0
+  }
+
+  /** Size of the given step's group (or the whole lay). Step coords run 0..size. */
+  private groupSize(stepIndex: number): P2 {
+    const g = this.geometry
+    if (g.groups) {
+      const gr = g.groups[g.steps[stepIndex].group || 0]
+      return [gr.widthCm, gr.lengthCm]
+    }
+    return [g.widthCm, g.lengthCm]
+  }
+
   onAwake(): void {
     const c = (col: vec4) => tintedMaterial(this.lineMaterial, col)
     this.mats = {
@@ -149,8 +189,9 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     const t = this.sceneObject.getTransform()
     const f = this.fabric.getTransform().getWorldPosition()
     const p = t.getWorldPosition()
-    const hx = Math.max(0, this.fabricSize.x / 2 - this.geometry.widthCm / 2 + 10)
-    const hz = Math.max(0, this.fabricSize.y / 2 - this.geometry.lengthCm / 2 + 10)
+    const lay = shownLaySize(this.geometry)
+    const hx = Math.max(0, this.fabricSize.x / 2 - lay[0] / 2 + 10)
+    const hz = Math.max(0, this.fabricSize.y / 2 - lay[1] / 2 + 10)
     const x = Math.min(f.x + hx, Math.max(f.x - hx, p.x))
     const z = Math.min(f.z + hz, Math.max(f.z - hz, p.z))
     const np = new vec3(x, this.fabricTopY(), z)
@@ -174,14 +215,19 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     this.geometry = g
     for (const v of this.visuals) v.root.destroy()
     this.visuals = []
-    this.content.getTransform().setLocalPosition(new vec3(-g.widthCm / 2, 0.15, -g.lengthCm / 2))
+    this.content.getTransform().setLocalPosition(new vec3(0, 0.15, 0))
+    const lay = shownLaySize(g)
     const shape = Shape.createBoxShape()
-    shape.size = new vec3(g.widthCm, 2, g.lengthCm)
+    shape.size = new vec3(lay[0], 2, lay[1])
     this.collider.shape = shape
 
     g.steps.forEach((st, i) => {
       const root = global.scene.createSceneObject(`Line_${i}`)
       root.setParent(this.content)
+      const gs = this.groupSize(i)
+      root.getTransform().setLocalPosition(new vec3(-gs[0] / 2, 0, -gs[1] / 2))
+      // Big styles: only the marks of this step's own lay group are drawn.
+      const marks = st.marks.filter((mk) => mk.group === undefined || mk.group === (st.group || 0))
       const mk = (name: string, y: number, build: (a: MeshAccumulator) => void): RenderMeshVisual => {
         const so = global.scene.createSceneObject(name)
         so.setParent(root)
@@ -194,7 +240,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       }
       const line = mk("Line", 0.08, (a) => {
         for (const l of st.lines) a.polyline(l, 0.4)
-        for (const mark of st.marks) {
+        for (const mark of marks) {
           a.segment(mark.a, mark.b, 0.3)
           this.ticks(a, mark.a, mark.b)
         }
@@ -213,7 +259,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       glow.sceneObject.setParent(root)
       const labels = global.scene.createSceneObject("MarkLabels")
       labels.setParent(root)
-      for (const mark of st.marks) this.addLabel(labels, mark.a, mark.b, mark.label)
+      this.addMarkLabels(labels, marks)
       this.visuals.push({root, line, seam, arrows, labels})
       ;(this.visuals[i] as StepVisual & {glow?: RenderMeshVisual}).glow = glow
     })
@@ -229,30 +275,72 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     for (const e of [p, q]) a.segment([e[0] - nx, e[1] - nz], [e[0] + nx, e[1] + nz], 0.3)
   }
 
-  private addLabel(parent: SceneObject, a: P2, b: P2, label: string): void {
-    const so = global.scene.createSceneObject("MarkLabel")
-    so.setParent(parent)
-    const vertical = Math.abs(b[1] - a[1]) > Math.abs(b[0] - a[0])
-    const mx = (a[0] + b[0]) / 2 + (vertical ? 1.5 : 0)
-    const mz = (a[1] + b[1]) / 2 + (vertical ? 0 : 2.6)
-    so.getTransform().setLocalPosition(new vec3(mx, 0.3, mz))
-    so.getTransform().setLocalRotation(quat.fromEulerAngles(-Math.PI / 2, 0, 0))
-    const t = so.createComponent("Component.Text") as Text
-    t.text = label
-    t.depthTest = true
-    applyTextRole(t, "Headline1", 330)
-    t.textFill.color = this.activeColor
-    t.horizontalAlignment = vertical ? HorizontalAlignment.Left : HorizontalAlignment.Center
-    t.verticalAlignment = VerticalAlignment.Center
-    t.horizontalOverflow = HorizontalOverflow.Overflow
-    t.layoutRect = Rect.create(vertical ? 0 : -16, vertical ? 30 : 16, -1.6, 1.6)
+  /**
+   * Measure-mark labels: one per mark, sized to fit, nudged apart so no two overlap,
+   * and kept inside the lay (so they stay on the fabric).
+   */
+  private addMarkLabels(parent: SceneObject, marks: {a: P2; b: P2; label: string}[]): void {
+    if (marks.length === 0) return
+    const gs = this.groupSize(this.visuals.length)
+    const H = MARK_TEXT_H_CM
+    const boxes = marks.map((mk) => {
+      const vertical = Math.abs(mk.b[1] - mk.a[1]) > Math.abs(mk.b[0] - mk.a[0])
+      const w = textWidthCm(mk.label, H)
+      const mx = (mk.a[0] + mk.b[0]) / 2 + (vertical ? 1.5 : 0)
+      const mz = (mk.a[1] + mk.b[1]) / 2 + (vertical ? 0 : 2.6)
+      // Vertical marks near the right edge get their label on the left of the line instead.
+      const x0 = vertical ? (mx + w > gs[0] + 1 ? mx - 3 - w : mx) : mx - w / 2
+      return {mk, vertical, w, x0, z: mz}
+    })
+    const pad = 0.6
+    const clampBox = (bx: (typeof boxes)[0]): void => {
+      bx.x0 = Math.min(gs[0] + 1 - bx.w, Math.max(-1, bx.x0))
+      bx.z = Math.min(gs[1] + 1 - H / 2, Math.max(-1 + H / 2, bx.z))
+    }
+    boxes.forEach(clampBox)
+    for (let pass = 0; pass < 30; pass++) {
+      let moved = false
+      for (let i = 0; i < boxes.length; i++)
+        for (let j = i + 1; j < boxes.length; j++) {
+          const p = boxes[i]
+          const q = boxes[j]
+          const ox = Math.min(p.x0 + p.w, q.x0 + q.w) - Math.max(p.x0, q.x0)
+          const oz = H + pad - Math.abs(p.z - q.z)
+          if (ox <= 0 || oz <= 0) continue
+          const dir = q.z >= p.z ? 1 : -1
+          q.z += (dir * oz) / 2 + dir * 0.05
+          p.z -= (dir * oz) / 2 + dir * 0.05
+          clampBox(p)
+          clampBox(q)
+          moved = true
+        }
+      if (!moved) break
+    }
+    for (const bx of boxes) {
+      const so = global.scene.createSceneObject("MarkLabel")
+      so.setParent(parent)
+      so.getTransform().setLocalPosition(new vec3(bx.x0, 0.3, bx.z))
+      so.getTransform().setLocalRotation(quat.fromEulerAngles(-Math.PI / 2, 0, 0))
+      const t = so.createComponent("Component.Text") as Text
+      t.text = bx.mk.label
+      t.depthTest = true
+      t.size = textSizeForHeight(H)
+      ;(t as Text & {weight?: number}).weight = 700
+      t.textFill.color = this.activeColor
+      t.horizontalAlignment = HorizontalAlignment.Left
+      t.verticalAlignment = VerticalAlignment.Center
+      t.horizontalOverflow = HorizontalOverflow.Overflow
+      t.layoutRect = Rect.create(0, bx.w + 2, -H / 2, H / 2)
+    }
   }
 
   /** -1 = aligning (whole outline shown); 0..n-1 = cutting; n = all done. */
   setCurrentStep(i: number): void {
     this.currentStep = i
     this.states = []
+    const ag = this.activeGroup()
     this.visuals.forEach((v, k) => {
+      v.root.enabled = !this.geometry || !this.geometry.groups || (this.geometry.steps[k].group || 0) === ag
       let s: LineState
       if (i < 0) s = "align"
       else if (k < i) s = "done"
@@ -283,42 +371,82 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       return
     }
     const st = g.steps[i]
+    const gs = this.groupSize(i)
     const pts = st.lines[0]
     const mid: P2 =
       pts.length === 2 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[Math.floor(pts.length / 2)]
-    let dx = mid[0] - st.centroid[0]
-    let dz = mid[1] - st.centroid[1]
-    const l = Math.sqrt(dx * dx + dz * dz) || 1
-    const off = -8 // inward: the free fabric inside the piece, right beside the line
-    let lx = mid[0] + (dx / l) * off - g.widthCm / 2
-    let lz = mid[1] + (dz / l) * off - g.lengthCm / 2
+    // Inside the piece: closed outlines get the label at the piece centre; open lines get it
+    // on the piece side of the line — above/below a horizontal line, beside a vertical one.
+    let ex = 0
+    let ez = 0
+    for (const p of pts) {
+      ex = Math.max(ex, Math.abs(p[0] - pts[0][0]))
+      ez = Math.max(ez, Math.abs(p[1] - pts[0][1]))
+    }
+    const inX = st.centroid[0] >= mid[0] ? 1 : -1
+    const inZ = st.centroid[1] >= mid[1] ? 1 : -1
     const isFold = st.id === "fold" || (st.id === undefined && i === 0)
     const foldVertical = isFold && Math.abs(pts[pts.length - 1][0] - pts[0][0]) < 0.01
+    let side = 0 // 0 = centred box, 1 = box ends at lx, -1 = box starts at lx
+    let horizontalLine = false
+    let lx = mid[0] - gs[0] / 2
+    let lz = mid[1] - gs[1] / 2
     if (isFold) {
-      // fold: lay the label inside the piece, beside the fold line
       if (foldVertical) {
-        lx = pts[0][0] + 3 - g.widthCm / 2
-        lz = mid[1] - g.lengthCm / 2
+        lx = pts[0][0] + 3 - gs[0] / 2
+        side = -1
       } else {
-        lx = mid[0] - g.widthCm / 2
-        lz = pts[0][1] + 4 - g.lengthCm / 2
+        lz = pts[0][1] + 4 - gs[1] / 2
+      }
+    } else if (st.closed) {
+      lx = st.centroid[0] - gs[0] / 2
+      lz = st.centroid[1] - gs[1] / 2
+    } else if (ex >= ez) {
+      horizontalLine = true
+    } else {
+      lx = mid[0] + inX * 3 - gs[0] / 2
+      side = inX > 0 ? -1 : 1
+    }
+
+    // Fit: one line at full size; long labels wrap to two lines; shrink only if still too wide.
+    const t = this.activeLabel
+    const fab = this.fabricLocalBounds()
+    const maxW = Math.min(ACTIVE_LABEL_MAX_W_CM, fab.x1 - fab.x0 - 2)
+    let h = ACTIVE_TEXT_H_CM
+    let lines = 1
+    let w = textWidthCm(st.label, h)
+    if (w > maxW) {
+      lines = 2
+      w = textWidthCm(st.label, h) / 2 + h * 1.5 // wrapped halves, plus slack for word breaks
+      if (w > maxW) {
+        h = (h * maxW) / w
+        w = maxW
       }
     }
-    so.getTransform().setLocalPosition(new vec3(lx, 0.4, lz))
-    const t = this.activeLabel
-    const side = foldVertical ? -1 : isFold ? 0 : Math.abs(dx / l) > 0.5 ? Math.sign(dx) : 0
-    if (side > 0) {
-      t.horizontalAlignment = HorizontalAlignment.Right
-      t.layoutRect = Rect.create(-45, 0, -2, 2)
-    } else if (side < 0) {
-      t.horizontalAlignment = HorizontalAlignment.Left
-      t.layoutRect = Rect.create(0, 45, -2, 2)
-    } else {
-      t.horizontalAlignment = HorizontalAlignment.Center
-      t.layoutRect = Rect.create(-22, 22, -2, 2)
-    }
+    const boxH = h * 1.25 * lines
+    // Label above/below the line: keep the whole (maybe two-line) box on the inner side of the line.
+    if (horizontalLine) lz = mid[1] + inZ * (3 + boxH / 2) - gs[1] / 2
+    // Box in pattern-local coords, then clamped inside the fabric.
+    let x0 = side > 0 ? lx - w : side < 0 ? lx : lx - w / 2
+    x0 = Math.min(fab.x1 - 1 - w, Math.max(fab.x0 + 1, x0))
+    lz = Math.min(fab.z1 - 1 - boxH / 2, Math.max(fab.z0 + 1 + boxH / 2, lz))
+    so.getTransform().setLocalPosition(new vec3(x0, 0.4, lz))
+    t.size = textSizeForHeight(h)
+    t.horizontalAlignment = side > 0 ? HorizontalAlignment.Right : side < 0 ? HorizontalAlignment.Left : HorizontalAlignment.Center
+    t.horizontalOverflow = HorizontalOverflow.Wrap
+    t.verticalOverflow = VerticalOverflow.Overflow
+    t.layoutRect = Rect.create(0, w, -boxH / 2, boxH / 2)
     t.text = st.label
     so.enabled = true
+  }
+
+  /** Fabric top-surface rectangle in this object's local XZ (pattern centre = 0,0). */
+  private fabricLocalBounds(): {x0: number; x1: number; z0: number; z1: number} {
+    const c = this.patternCenterWorld
+    const f = this.fabric ? this.fabric.getTransform().getWorldPosition() : c
+    const cx = f.x - c.x
+    const cz = f.z - c.z
+    return {x0: cx - this.fabricSize.x / 2, x1: cx + this.fabricSize.x / 2, z0: cz - this.fabricSize.y / 2, z1: cz + this.fabricSize.y / 2}
   }
 
   /** World point beside the current line (its midpoint), for placing the step label. */
@@ -335,6 +463,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       sz += p[1]
     }
     const n = Math.max(1, pts.length)
-    return new vec3(center.x - g.widthCm / 2 + sx / n, center.y, center.z - g.lengthCm / 2 + sz / n)
+    const gs = this.groupSize(this.currentStep)
+    return new vec3(center.x - gs[0] / 2 + sx / n, center.y, center.z - gs[1] / 2 + sz / n)
   }
 }

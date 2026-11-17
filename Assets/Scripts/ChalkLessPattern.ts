@@ -33,6 +33,8 @@ export interface Mark {
   a: P2
   b: P2
   label: string
+  /** Lay group the mark belongs to (big styles shown in groups). */
+  group?: number
 }
 
 export interface StepGeometry {
@@ -42,6 +44,15 @@ export interface StepGeometry {
   centroid: P2 // the piece the line belongs to (for outward seam allowance)
   marks: Mark[] // measure step only
   label: string // step label text, lengths calculated from measurements ("Cut ..." = cut line)
+  /** Lay group (0 = first lay shown); only set for big styles split into groups. */
+  group?: number
+}
+
+/** One group of pieces shown on the fabric at a time (coords of its steps start at 0,0). */
+export interface LayGroup {
+  name: string
+  widthCm: number
+  lengthCm: number
 }
 
 export interface PatternGeometry {
@@ -50,6 +61,8 @@ export interface PatternGeometry {
   steps: StepGeometry[]
   /** True when the layout was turned 90° so the length runs along the fabric width. */
   transposed?: boolean
+  /** Big styles: pieces shown one group at a time; each step's coords are local to its group. */
+  groups?: LayGroup[]
 }
 
 /** One garment style: everything Main needs to drive menu → measure → cut → summary. */
@@ -162,6 +175,84 @@ export function finishLayout(steps: StepGeometry[], allowTranspose = true): Patt
     l = t
   }
   return {widthCm: w, lengthCm: l, steps: out, transposed: transpose}
+}
+
+/**
+ * Split a big lay into two groups shown one after the other (e.g. jacket, then trousers).
+ * widthCm/lengthCm stay the full lay (pattern size + fabric estimate unchanged); every step's
+ * coordinates are moved so its group starts at (0,0), turned 90° when that group is too deep for the table.
+ * The fold line is clipped to group 0; measure marks go to the group whose pieces contain them.
+ */
+export function splitLay(g: PatternGeometry, names: [string, string], group1Ids: string[]): PatternGeometry {
+  const grp = (st: StepGeometry): number => (st.id && group1Ids.indexOf(st.id) >= 0 ? 1 : 0)
+  const box = [0, 1].map(() => ({x0: Infinity, z0: Infinity, x1: -Infinity, z1: -Infinity}))
+  const grow = (k: number, p: P2): void => {
+    const b = box[k]
+    b.x0 = Math.min(b.x0, p[0])
+    b.z0 = Math.min(b.z0, p[1])
+    b.x1 = Math.max(b.x1, p[0])
+    b.z1 = Math.max(b.z1, p[1])
+  }
+  for (const st of g.steps) if (st.id !== "fold") for (const l of st.lines) for (const p of l) grow(grp(st), p)
+  const inside = (k: number, p: P2): boolean => {
+    const b = box[k]
+    return p[0] >= b.x0 - 1 && p[0] <= b.x1 + 1 && p[1] >= b.z0 - 1 && p[1] <= b.z1 + 1
+  }
+  const markGroup = (mk: Mark): number => {
+    const mid: P2 = [(mk.a[0] + mk.b[0]) / 2, (mk.a[1] + mk.b[1]) / 2]
+    return inside(1, mid) && !inside(0, mid) ? 1 : 0
+  }
+  // Marks extend their group's box a little (labels sit beside them).
+  for (const st of g.steps) for (const mk of st.marks) {
+    const k = markGroup(mk)
+    grow(k, mk.a)
+    grow(k, mk.b)
+  }
+  // Turn a group only when it is too deep for the table and wider would fit better.
+  const turn = box.map((b) => b.z1 - b.z0 > FABRIC_DEPTH_FIT_CM + 24 && b.z1 - b.z0 > b.x1 - b.x0)
+  const map = (k: number, p: P2): P2 => {
+    const b = box[k]
+    const x = p[0] - b.x0
+    const z = p[1] - b.z0
+    return turn[k] ? [z, x] : [x, z]
+  }
+  const clip = (k: number, p: P2): P2 => {
+    const b = box[k]
+    return [Math.min(b.x1 + 2, Math.max(b.x0 - 2, p[0])), Math.min(b.z1 + 2, Math.max(b.z0 - 2, p[1]))]
+  }
+  const steps: StepGeometry[] = g.steps.map((st) => {
+    const k = grp(st)
+    return {
+      id: st.id,
+      lines: st.lines.map((ln) => ln.map((p) => map(k, st.id === "fold" ? clip(k, p) : p))),
+      closed: st.closed,
+      centroid: map(k, st.centroid),
+      marks: st.marks.map((mk) => {
+        const mg = markGroup(mk)
+        return {a: map(mg, mk.a), b: map(mg, mk.b), label: mk.label, group: mg}
+      }),
+      label: st.label,
+      group: k,
+    }
+  })
+  const groups: LayGroup[] = box.map((b, k) => {
+    const w = b.x1 - b.x0
+    const l = b.z1 - b.z0
+    return {name: names[k], widthCm: turn[k] ? l : w, lengthCm: turn[k] ? w : l}
+  })
+  return {widthCm: g.widthCm, lengthCm: g.lengthCm, steps, transposed: g.transposed, groups}
+}
+
+/** Size of the lay actually shown on the fabric at once (largest group, or the whole lay). */
+export function shownLaySize(g: PatternGeometry): P2 {
+  if (!g.groups || g.groups.length === 0) return [g.widthCm, g.lengthCm]
+  let w = 0
+  let l = 0
+  for (const gr of g.groups) {
+    w = Math.max(w, gr.widthCm)
+    l = Math.max(l, gr.lengthCm)
+  }
+  return [w, l]
 }
 
 /** Offset a polyline outward (away from centroid) by dist, per-vertex averaged normals. */

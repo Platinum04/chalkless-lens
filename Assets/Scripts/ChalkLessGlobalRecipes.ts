@@ -13,6 +13,7 @@ import {
   cutStep,
   easeCurve,
   finishLayout,
+  splitLay,
   Mark,
   MeasurementDef,
   Measurements,
@@ -175,7 +176,7 @@ function buildSuit(m: Measurements): PatternGeometry {
   const c: P2 = [sx / 2, (tz + m.trouserLength) / 2]
   const steps: StepGeometry[] = [
     fold(L, j.backC, `Fold here — back on the fold, ${r(L)} cm`),
-    measure(c, [...jacketMarks(m, j, sx, sw), ...trouserMarks(m, t, 0, tz, "Leg hem")], "Check the marks — jacket: neck, chest, waist, sleeve; trousers: waist, hip, rise, length"),
+    measure(c, [...jacketMarks(m, j, sx, sw), ...trouserMarks(m, t, 0, tz, "Leg hem")], "Check the jacket marks — neck, shoulder, chest, waist, length, sleeve"),
     cutStep("jacketFront", [j.front], j.frontC, `Cut jacket front + lapel — ${len(j.front)} cm outline`, true),
     cutStep("jacketBack", [j.back], j.backC, `Cut jacket back on the fold — ${len(j.back)} cm`),
     cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve — ${len(sleeve)} cm outline`, true),
@@ -184,7 +185,8 @@ function buildSuit(m: Measurements): PatternGeometry {
     cutStep("trouserBack", [t.back], t.backC, `Cut trouser back — ${len(t.back)} cm outline`, true),
     cutStep("waistband", [band], [t.right + G + 4, tz + (m.waist + 6) / 2], `Cut waistband — ${r(m.waist + 6)} × 8 cm`, true),
   ]
-  return finishLayout(steps)
+  // 197 × 146 cm in one lay is bigger than the table: show the jacket lay, then the trouser lay.
+  return splitLay(finishLayout(steps), ["Jacket", "Trousers"], ["trouserFront", "trouserBack", "waistband"])
 }
 
 const SUIT: StyleRecipe = {
@@ -673,7 +675,7 @@ function buildMaxi(m: Measurements): PatternGeometry {
         {a: [3, z0], b: [3, z0 + SL], label: `Skirt ${m.skirtLength} cm`},
         {a: pt(rw + SL - 4, 0), b: pt(rw + SL - 4, theta), label: `Hem sweep ${m.hemSweep} cm`},
       ],
-      "Check the marks — neck, bust, waist, bodice, skirt length, hem sweep",
+      "Check the bodice marks — neck, bust, waist, bodice length",
     ),
     cutStep("neckline", [b.neck], bc, `Cut bodice neckline — ${len(b.neck)} cm curve`),
     cutStep("shoulder", [b.shoulder], bc, `Cut shoulder — ${len(b.shoulder)} cm`),
@@ -683,7 +685,8 @@ function buildMaxi(m: Measurements): PatternGeometry {
     cutStep("skirtSide", [skirtSide], sc, `Cut flared skirt side — ${len(skirtSide)} cm`),
     cutStep("skirtHem", [hemLine], sc, `Cut skirt hem — ${len(hemLine)} cm curve`),
   ]
-  return finishLayout(steps)
+  // The full lay runs ~2 m: show the bodice lay, then the skirt lay.
+  return splitLay(finishLayout(steps), ["Bodice", "Skirt"], ["skirtWaist", "skirtSide", "skirtHem"])
 }
 
 const MAXI: StyleRecipe = {

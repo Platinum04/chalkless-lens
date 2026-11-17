@@ -266,16 +266,18 @@ export class ChalkLessMain extends BaseScriptComponent {
     const tt = this.tableObj ? (this.tableObj.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable) : null
     if (!this.baseFabric) this.baseFabric = ft ? ft.currentSize : new vec3(this.pattern.fabricSize.x, 0.4, this.pattern.fabricSize.y)
     if (!this.baseTable && tt) this.baseTable = tt.currentSize
-    const g = this.geometry
-    const w = Math.max(this.baseFabric.x, Math.ceil(g.widthCm + 10))
-    const d = Math.max(this.baseFabric.z, Math.ceil(g.lengthCm + 6))
+    // Big styles split into lay groups (suit: jacket then trousers) size the fabric to the largest group.
+    const lay = this.pattern.laySizeCm
+    const w = Math.max(this.baseFabric.x, Math.ceil(lay.x + 8))
+    const d = Math.max(this.baseFabric.z, Math.ceil(lay.y + 4))
     this.fabricEnlarged = w > this.baseFabric.x || d > this.baseFabric.z
     if (ft) ft.resize(new vec3(w, this.baseFabric.y, d))
-    if (tt && this.baseTable) tt.resize(new vec3(Math.max(this.baseTable.x, w + 50), this.baseTable.y, Math.max(this.baseTable.z, d + 10)))
+    // Table stays within ~180 × 115 cm so the whole lay is in view from the standing eye position.
+    if (tt && this.baseTable) tt.resize(new vec3(Math.max(this.baseTable.x, w + 20), this.baseTable.y, Math.max(this.baseTable.z, d + 4)))
     this.pattern.fabricSize = new vec2(w, d)
     const f = this.fabric.getTransform().getWorldPosition()
-    const maxX = Math.max(0, w / 2 - g.widthCm / 2 - 2)
-    const maxZ = Math.max(0, d / 2 - g.lengthCm / 2 - 2)
+    const maxX = Math.max(0, w / 2 - lay.x / 2 - 2)
+    const maxZ = Math.max(0, d / 2 - lay.y / 2 - 2)
     const ox = Math.min(maxX, Math.max(-maxX, this.patternStartOffset.x))
     const oz = Math.min(maxZ, Math.max(-maxZ, this.patternStartOffset.y))
     this.pattern.getSceneObject().getTransform().setWorldPosition(new vec3(f.x + ox, f.y, f.z + oz))
@@ -299,7 +301,9 @@ export class ChalkLessMain extends BaseScriptComponent {
     const a = this.pattern.currentLineAnchorWorld()
     const z = Math.min(f.z + 22, Math.max(f.z - 22, a.z))
     const c = this.pattern.patternCenterWorld
-    const x = Math.max(f.x + this.stepPanelX, c.x + this.geometry.widthCm / 2 + 21)
+    // Beside the lay, but never further out than just past the fabric's right edge (stays in view, never covers lines).
+    const tableHalf = this.pattern.fabricSize.x / 2 + 23
+    const x = Math.min(f.x + tableHalf, Math.max(f.x + this.stepPanelX, c.x + this.pattern.laySizeCm.x / 2 + 24))
     this.stepPanel.moveTo(new vec3(x, f.y + 0.6, z))
   }
 }
