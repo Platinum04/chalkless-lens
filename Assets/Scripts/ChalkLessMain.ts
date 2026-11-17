@@ -15,7 +15,8 @@ import {ChalkLessSummaryUI} from "./ChalkLessSummaryUI"
 import {BUBA, defaultsOf, fabricSavedEstimate, Measurements, PatternGeometry, StyleRecipe} from "./ChalkLessPattern"
 import {findStyle} from "./ChalkLessStyleRecipes"
 import {ChalkLessWorkTable} from "./ChalkLessWorkTable"
-import {prepareCuttingGeometry} from "./ChalkLessConstruction"
+import {prepareCuttingGeometry, rotateLongLay} from "./ChalkLessConstruction"
+import {readingYaw, setViewerOverride, smoothK, viewerPosition, wrapAngle, yawQuat} from "./ChalkLessViewer"
 import {ChalkLessTableFinder, TableSurface} from "./ChalkLessTableFinder"
 import {ChalkLessFabricFinder, FabricRect} from "./ChalkLessFabricFinder"
 
@@ -77,6 +78,14 @@ export class ChalkLessMain extends BaseScriptComponent {
   @hint("Extra margin a standard chalk layout leaves around the pattern (cm) — for the fabric-saved estimate")
   @widget(new SliderWidget(0, 10, 0.5))
   chalkMarginCm: number = 4
+  @input
+  @hint("Walk-around: panels re-face the tailor after they move this far (cm)")
+  @widget(new SliderWidget(20, 150, 5))
+  followMoveCm: number = 60
+  @input
+  @hint("Walk-around: panels re-face the tailor after they circle the table this much (deg)")
+  @widget(new SliderWidget(15, 90, 5))
+  followTurnDeg: number = 45
   @ui.group_end
   @ui.separator
   @ui.group_start("Debug")
@@ -90,6 +99,9 @@ export class ChalkLessMain extends BaseScriptComponent {
   @input
   @hint("Debug jump uses every measurement at its maximum (checks that big lays still fit)")
   debugMaxMeasurements: boolean = false
+  @input
+  @hint("Walk-around review: pretend the tailor's head is here (world cm, relative to the fabric centre). 0,0,0 = use the real head.")
+  debugTailorOffset: vec3 = new vec3(0, 0, 0)
   @ui.group_end
 
   phase: Phase = "menu"
@@ -105,6 +117,18 @@ export class ChalkLessMain extends BaseScriptComponent {
   private baseTable: vec3
   private baseTablePos: vec3
   private tableObj: SceneObject
+  /** Pattern meshes lag behind the geometry while measuring (hidden then); rebuilt before they show. */
+  private patternDirty = false
+  /** Last measurement tap: ms spent updating (for the log / perf checks). */
+  lastAdjustMs = 0
+  private follow: {so: SceneObject; offset: vec3; rot: quat}[] = []
+  private followAz = 0
+  private followFrom: vec3 | null = null
+  private followYaw = 0
+  /** Yaw (deg) the floating panels currently use to face the tailor (0 = authored side). */
+  get panelYawDeg(): number {
+    return (this.followYaw * 180) / Math.PI
+  }
 
   get styleName(): string {
     return this.recipe.name
@@ -150,6 +174,9 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.stepPanel.onStartCutting.add(() => this.startCutting())
     this.stepPanel.onNext.add(() => this.next())
     this.summary.onRestart.add(() => this.restart())
+    if (this.debugTailorOffset.length > 0) setViewerOverride(this.fabric.getTransform().getWorldPosition().add(this.debugTailorOffset))
+    this.initFollow()
+    this.createEvent("UpdateEvent").bind(() => this.updateFollow())
     this.restart()
     // First start only: find the real table (device). Preview falls back at once, so this stays on "menu".
     if (this.tableFinder && this.debugJumpToStep === -1) {
@@ -192,6 +219,8 @@ export class ChalkLessMain extends BaseScriptComponent {
   private onTableFound(s: TableSurface | null): void {
     this.tableReady = true
     if (s) this.moveWorkAreaTo(s.position)
+    // Real table found (device): the virtual table slab would only hide it.
+    if (s && this.tableObj) this.setSlabVisible(this.tableObj, false)
     this.restart()
     if (!this.fabricFinder) return
     const y = this.fabric.getTransform().getWorldPosition().y
@@ -211,6 +240,8 @@ export class ChalkLessMain extends BaseScriptComponent {
   applyDetectedFabric(r: FabricRect | null): void {
     this.detectedFabric = r
     if (!r) return
+    // Real cloth found: drop the virtual fabric slab, the pattern lies on the real cloth.
+    this.setSlabVisible(this.fabric, false)
     const ft = this.fabric.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable
     const tr = this.fabric.getTransform()
     const f = tr.getWorldPosition()
@@ -260,9 +291,12 @@ export class ChalkLessMain extends BaseScriptComponent {
     const d = this.recipe.measurements[this.measureIndex]
     const v = Math.min(d.maxCm, Math.max(d.minCm, this.measurements[d.key] + delta))
     this.measurements[d.key] = Math.round(v * 10) / 10
-    this.refreshGeometry()
+    const t0 = Date.now()
+    // Cheap path: geometry + mini preview only. The hidden full-size pattern is rebuilt at placePattern.
+    this.refreshGeometry(false)
     this.pushMeasurement()
-    print(`ChalkLess: ${d.key}=${this.measurements[d.key]} pattern=${this.geometry.widthCm.toFixed(1)}x${this.geometry.lengthCm.toFixed(1)}`)
+    this.lastAdjustMs = Date.now() - t0
+    print(`ChalkLess: ${d.key}=${this.measurements[d.key]} pattern=${this.geometry.widthCm.toFixed(1)}x${this.geometry.lengthCm.toFixed(1)} (${this.lastAdjustMs} ms)`)
   }
 
   /** "Next measurement"; on the last one it acts as "Place pattern". */
@@ -379,6 +413,7 @@ export class ChalkLessMain extends BaseScriptComponent {
 
   /** Grow the fabric (and table) stand-in when a style's lay is bigger than the default 150 × 80 cm. */
   private fitFabric(): void {
+    this.ensurePattern()
     const ft = this.fabric.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable
     const tt = this.tableObj ? (this.tableObj.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable) : null
     if (!this.baseFabric) this.baseFabric = ft ? ft.currentSize : new vec3(this.pattern.fabricSize.x, 0.4, this.pattern.fabricSize.y)
@@ -414,10 +449,17 @@ export class ChalkLessMain extends BaseScriptComponent {
     if (this.fabricEnlarged) print(`ChalkLess: fabric stand-in enlarged to ${w} x ${d} cm for ${this.styleId}`)
   }
 
-  private refreshGeometry(): void {
-    this.geometry = prepareCuttingGeometry(this.recipe.build(this.measurements), this.recipe.steps, this.pattern.seamAllowanceCm)
-    this.pattern.rebuild(this.geometry)
+  private refreshGeometry(rebuildPattern = true): void {
+    this.geometry = rotateLongLay(prepareCuttingGeometry(this.recipe.build(this.measurements), this.recipe.steps, this.pattern.seamAllowanceCm))
     this.measurePad.setMiniPreview(this.geometry)
+    this.patternDirty = true
+    if (rebuildPattern) this.ensurePattern()
+  }
+
+  private ensurePattern(): void {
+    if (!this.patternDirty) return
+    this.patternDirty = false
+    this.pattern.rebuild(this.geometry)
   }
 
   private pushMeasurement(): void {
@@ -450,6 +492,13 @@ export class ChalkLessMain extends BaseScriptComponent {
       bz0 = Math.min(bz0, tp.z - ts.z / 2)
       bz1 = Math.max(bz1, tp.z + ts.z / 2)
     }
+    // Face the tailor first, so the footprint below uses the card's final orientation.
+    const viewer = viewerPosition()
+    const fc = this.pattern.currentLineAnchorWorld()
+    if (viewer) this.stepPanel.faceYaw(readingYaw(fc, viewer), true)
+    // Tailor's position projected onto the table top: the card should sit on their side of the line.
+    const ux = viewer ? Math.min(bx1, Math.max(bx0, viewer.x)) : (bx0 + bx1) / 2
+    const uz = viewer ? Math.min(bz1, Math.max(bz0, viewer.z)) : bz1
     // Card footprint (local plane) -> world XZ offsets from its centre.
     const fp = this.stepPanel.footprint
     const wt = this.stepPanel.getSceneObject().getTransform().getWorldTransform()
@@ -496,8 +545,8 @@ export class ChalkLessMain extends BaseScriptComponent {
       if (dmin >= bestScore) return
       let covered = 0
       for (const p of obs.other) if (p.x > x0 && p.x < x1 && p.y > z0 && p.y < z1) covered++
-      // Short leader first; covering other lines costs ~1 cm per 5 cm of line; near side preferred.
-      const score = dmin + covered * 0.8 + (bz1 - z1) * 0.12
+      // Short leader first; covering other lines costs ~1 cm per 5 cm of line; the tailor's side is strongly preferred.
+      const score = dmin + covered * 0.8 + Math.hypot(cx - ux, cz - uz) * 0.25
       if (score < bestScore) {
         bestScore = score
         best = new vec2(cx, cz)
@@ -512,9 +561,71 @@ export class ChalkLessMain extends BaseScriptComponent {
     if (!best) return false
     const pos = new vec3(best.x, f.y + 0.6, best.y)
     this.stepPanel.moveTo(pos)
+    if (viewer) this.stepPanel.faceYaw(readingYaw(pos, viewer), false)
     this.stepPanel.setLeaderTarget(this.pattern.currentLineNearestWorld(pos))
     return true
   }
+
+  private setSlabVisible(so: SceneObject, on: boolean): void {
+    const wt = so.getComponent(ChalkLessWorkTable.getTypeName()) as ChalkLessWorkTable
+    if (wt) wt.setSlabVisible(on)
+  }
+
+  /** Floating panels (menu, measure pad, summary, table finder) keep their authored offset from the fabric. */
+  private initFollow(): void {
+    const f = this.fabric.getTransform().getWorldPosition()
+    const add = (so: SceneObject | null | undefined): void => {
+      if (!so) return
+      const t = so.getTransform()
+      this.follow.push({so, offset: t.getWorldPosition().sub(f), rot: t.getWorldRotation()})
+    }
+    add(this.garmentMenu.getSceneObject())
+    add(this.measurePad.getSceneObject())
+    add(this.summary.getSceneObject())
+    if (this.tableFinder && this.tableFinder.ui) add(this.tableFinder.ui.getSceneObject())
+    const v = viewerPosition()
+    this.followFrom = v
+    // Authored layout assumes the tailor at the near (+Z) side of the table.
+    this.followAz = v ? this.azimuth(v) : 0
+    if (Math.abs(this.followAz) < (this.followTurnDeg * Math.PI) / 360) this.followAz = 0
+    this.followYaw = this.followAz
+  }
+
+  /** Angle of the tailor around the fabric centre (0 = authored near side, +Z). */
+  private azimuth(v: vec3): number {
+    const f = this.fabric.getTransform().getWorldPosition()
+    return Math.atan2(v.x - f.x, v.z - f.z)
+  }
+
+  /**
+   * Walk-around (lazy, with hysteresis): when the tailor has moved > followMoveCm or circled the table by
+   * > followTurnDeg, swing the floating panels round the fabric to the same place relative to the tailor
+   * (yawed to face them) and re-place the step card on the tailor's side of the active line. The pattern and
+   * fabric never move. Panels glide there in ~200 ms.
+   */
+  private updateFollow(): void {
+    const v = viewerPosition()
+    if (!v || !this.followFrom) return
+    const az = this.azimuth(v)
+    const moved = Math.hypot(v.x - this.followFrom.x, v.z - this.followFrom.z)
+    if (moved > this.followMoveCm || Math.abs(wrapAngle(az - this.followAz)) > (this.followTurnDeg * Math.PI) / 180) {
+      this.followFrom = v
+      this.followAz = Math.abs(az) < (this.followTurnDeg * Math.PI) / 360 ? 0 : az
+      if (this.phase === "cutting" || this.phase === "align") this.placeStepPanel()
+    }
+    if (this.followYaw === this.followAz && this.followSettled) return
+    this.followYaw = wrapAngle(this.followYaw + wrapAngle(this.followAz - this.followYaw) * smoothK(0.06))
+    if (Math.abs(wrapAngle(this.followAz - this.followYaw)) < 0.002) this.followYaw = this.followAz
+    const f = this.fabric.getTransform().getWorldPosition()
+    const q = yawQuat(this.followYaw)
+    for (const p of this.follow) {
+      const t = p.so.getTransform()
+      t.setWorldPosition(f.add(q.multiplyVec3(p.offset)))
+      t.setWorldRotation(q.multiply(p.rot))
+    }
+    this.followSettled = this.followYaw === this.followAz
+  }
+  private followSettled = false
 
   private placeStepPanel(): void {
     if (this.phase === "cutting" && this.placeCardNearActiveLine()) return
@@ -526,6 +637,8 @@ export class ChalkLessMain extends BaseScriptComponent {
     const tableHalf = this.pattern.fabricSize.x / 2 + 23
     const x = Math.min(f.x + tableHalf, Math.max(f.x + this.stepPanelX, c.x + this.pattern.laySizeCm.x / 2 + 26))
     this.stepPanel.moveTo(new vec3(x, f.y + 0.6, z))
+    const viewer = viewerPosition()
+    if (viewer) this.stepPanel.faceYaw(readingYaw(new vec3(x, f.y, z), viewer), true)
     this.stepPanel.setLeaderTarget(this.pattern.currentLineNearestWorld(new vec3(x, f.y, z)))
   }
 }

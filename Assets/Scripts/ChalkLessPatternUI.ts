@@ -12,6 +12,11 @@ import {InteractableManipulation} from "InteractionKit.lspkg/Components/Interact
 import {MeshAccumulator, tintedMaterial} from "./ChalkLessLines"
 import {P2, PatternGeometry, shownLaySize} from "./ChalkLessPattern"
 import {applyTextRole} from "./ChalkLessStyleUI"
+import {approachAngle, readingYaw, smoothK, viewerPosition, wrapAngle, yawQuat} from "./ChalkLessViewer"
+
+const FLAT = quat.fromEulerAngles(-Math.PI / 2, 0, 0)
+/** Turn needed before flat labels re-face the tailor (hysteresis). */
+const LABEL_HYSTERESIS = (20 * Math.PI) / 180
 
 /** Text heights (cm) lying on the fabric; text size per cm calibrated in the preview. */
 const ACTIVE_TEXT_H_CM = 3
@@ -93,6 +98,15 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
   private currentStep = -1
   private states: LineState[] = []
   private activeLabel: Text
+  /** Flat text lying on the fabric (active label + mark labels); turned about the vertical to face the tailor. */
+  private flatLabels: SceneObject[] = []
+  private labelYaw = 0
+  private labelTargetYaw = 0
+
+  /** Yaw (deg) of the flat labels (0 = authored, read from the near +Z side). */
+  get labelYawDeg(): number {
+    return (this.labelYaw * 180) / Math.PI
+  }
 
   /** Text of the label lying beside the glowing line ("" when none). */
   get activeLabelText(): string {
@@ -154,6 +168,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     const lo = global.scene.createSceneObject("ActiveLineLabel")
     lo.setParent(this.sceneObject)
     lo.getTransform().setLocalRotation(quat.fromEulerAngles(-Math.PI / 2, 0, 0))
+    this.flatLabels.push(lo)
     this.activeLabel = lo.createComponent("Component.Text") as Text
     this.activeLabel.depthTest = true
     applyTextRole(this.activeLabel, "Title2", 300)
@@ -176,7 +191,10 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     this.manip.enableYTranslation = false
     this.setDraggable(false)
 
-    this.createEvent("LateUpdateEvent").bind(() => this.constrainToFabric())
+    this.createEvent("LateUpdateEvent").bind(() => {
+      this.constrainToFabric()
+      this.faceLabels()
+    })
   }
 
   /** Fabric top surface in world space. */
@@ -200,6 +218,25 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     t.setLocalScale(vec3.one())
   }
 
+  /** Walk-around: flat labels read upright from wherever the tailor stands (hysteresis, ~200 ms ease). */
+  private faceLabels(): void {
+    const v = viewerPosition()
+    if (v) {
+      const want = readingYaw(this.patternCenterWorld, v)
+      if (Math.abs(wrapAngle(want - this.labelTargetYaw)) > LABEL_HYSTERESIS) this.labelTargetYaw = want
+    }
+    if (this.labelYaw === this.labelTargetYaw) return
+    this.labelYaw = approachAngle(this.labelYaw, this.labelTargetYaw, smoothK(0.06))
+    if (Math.abs(wrapAngle(this.labelTargetYaw - this.labelYaw)) < 0.002) this.labelYaw = this.labelTargetYaw
+    this.applyLabelYaw()
+  }
+
+  private applyLabelYaw(): void {
+    const q = yawQuat(this.labelYaw).multiply(FLAT)
+    this.flatLabels = this.flatLabels.filter((so) => !isNull(so))
+    for (const so of this.flatLabels) so.getTransform().setLocalRotation(q)
+  }
+
   setDraggable(on: boolean): void {
     this.draggable = on
     this.interactable.enabled = on
@@ -215,6 +252,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     this.geometry = g
     for (const v of this.visuals) v.root.destroy()
     this.visuals = []
+    this.flatLabels = [this.activeLabel.getSceneObject()]
     this.content.getTransform().setLocalPosition(new vec3(0, 0.15, 0))
     const lay = shownLaySize(g)
     const shape = Shape.createBoxShape()
@@ -263,6 +301,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       this.visuals.push({root, line, seam, arrows, labels})
       ;(this.visuals[i] as StepVisual & {glow?: RenderMeshVisual}).glow = glow
     })
+    this.applyLabelYaw()
     this.setCurrentStep(this.currentStep)
   }
 
@@ -319,8 +358,11 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     for (const bx of boxes) {
       const so = global.scene.createSceneObject("MarkLabel")
       so.setParent(parent)
-      so.getTransform().setLocalPosition(new vec3(bx.x0, 0.3, bx.z))
-      so.getTransform().setLocalRotation(quat.fromEulerAngles(-Math.PI / 2, 0, 0))
+      // Pivot at the box centre so turning to face the tailor keeps the label on its mark.
+      const bw = bx.w + 2
+      so.getTransform().setLocalPosition(new vec3(bx.x0 + bw / 2, 0.3, bx.z))
+      so.getTransform().setLocalRotation(yawQuat(this.labelYaw).multiply(FLAT))
+      this.flatLabels.push(so)
       const t = so.createComponent("Component.Text") as Text
       t.text = bx.mk.label
       t.depthTest = true
@@ -330,7 +372,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
       t.horizontalAlignment = HorizontalAlignment.Left
       t.verticalAlignment = VerticalAlignment.Center
       t.horizontalOverflow = HorizontalOverflow.Overflow
-      t.layoutRect = Rect.create(0, bx.w + 2, -H / 2, H / 2)
+      t.layoutRect = Rect.create(-bw / 2, bw / 2, -H / 2, H / 2)
     }
   }
 
@@ -450,12 +492,12 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     // Above/below-line labels: slide further into the piece until clear of the other visible lines
     // (e.g. the Maxi bodice neckline label used to sit on the shoulder line).
     if (!isFold && !st.closed) lz = this.slideClear(i, x0, w, lz, boxH * 1.6, inZ, fab)
-    so.getTransform().setLocalPosition(new vec3(x0, 0.4, lz))
+    so.getTransform().setLocalPosition(new vec3(x0 + w / 2, 0.4, lz))
     t.size = textSizeForHeight(h)
     t.horizontalAlignment = side > 0 ? HorizontalAlignment.Right : side < 0 ? HorizontalAlignment.Left : HorizontalAlignment.Center
     t.horizontalOverflow = HorizontalOverflow.Wrap
     t.verticalOverflow = VerticalOverflow.Overflow
-    t.layoutRect = Rect.create(0, w, -boxH / 2, boxH / 2)
+    t.layoutRect = Rect.create(-w / 2, w / 2, -boxH / 2, boxH / 2)
     t.text = st.label
     so.enabled = true
   }
@@ -561,7 +603,14 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     if (so.enabled) {
       const r = this.activeLabel.layoutRect
       const p = so.getTransform().getWorldPosition()
-      out.label = new vec4(p.x + r.left, p.z + r.bottom, p.x + r.right, p.z + r.top)
+      // Text lies flat and may be turned to face the tailor: use the turned box's world extents.
+      const hw = (r.right - r.left) / 2
+      const hh = (r.top - r.bottom) / 2
+      const c = Math.abs(Math.cos(this.labelYaw))
+      const sn = Math.abs(Math.sin(this.labelYaw))
+      const ex = hw * c + hh * sn
+      const ez = hw * sn + hh * c
+      out.label = new vec4(p.x - ex, p.z - ez, p.x + ex, p.z + ez)
     }
     return out
   }

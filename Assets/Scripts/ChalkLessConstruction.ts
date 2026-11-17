@@ -149,3 +149,47 @@ export function prepareCuttingGeometry(source: PatternGeometry, definitions: Ste
   }
   return {...source, steps, groups, widthCm: source.groups ? source.widthCm : width, lengthCm: source.groups ? source.lengthCm : length}
 }
+
+/** Fabric depth the lay should stay within (table ≈115 cm deep incl. margins). */
+export const LAY_DEPTH_FIT_CM = 107
+
+/**
+ * Turn a whole lay (or each lay group) a quarter turn when it runs too deep for the table, so the long
+ * pieces lie along the table's long axis. This is a true rotation (not a mirror) of every piece AND of the
+ * cloth under it: grain arrows turn with the pieces, so grain relative to the cloth is unchanged. The
+ * fabric stand-in is sized from the turned lay, i.e. the cloth is simply laid lengthwise along the table.
+ */
+export function rotateLongLay(g: PatternGeometry, depthFitCm = LAY_DEPTH_FIT_CM): PatternGeometry {
+  const sizes: P2[] = g.groups ? g.groups.map((gr) => [gr.widthCm, gr.lengthCm] as P2) : [[g.widthCm, g.lengthCm]]
+  const turn = sizes.map((s) => s[1] > depthFitCm && s[0] < s[1])
+  if (!turn.some((t) => t)) return g
+  // (x, z) -> (z, W - x): a quarter turn seen from above (determinant +1, so no piece is mirrored).
+  const rot = (k: number, p: P2): P2 => (turn[k] ? [p[1], sizes[k][0] - p[0]] : p)
+  const dir = (k: number, d: P2): P2 => (turn[k] ? [d[1], -d[0]] : d)
+  const steps: StepGeometry[] = g.steps.map((s) => {
+    const k = g.groups ? s.group || 0 : 0
+    return {
+      ...s,
+      lines: s.lines.map((l) => l.map((p) => rot(k, p))),
+      stitchLines: s.stitchLines?.map((l) => l.map((p) => rot(k, p))),
+      centroid: rot(k, s.centroid),
+      lineCentroids: s.lineCentroids?.map((c) => rot(k, c)),
+      grainDirection: s.grainDirection && dir(k, s.grainDirection),
+      marks: s.marks.map((m) => {
+        const mk = g.groups ? (m.group ?? k) : 0
+        return {...m, a: rot(mk, m.a), b: rot(mk, m.b)}
+      }),
+    }
+  })
+  const groups = g.groups?.map((gr, k) => (turn[k] ? {...gr, widthCm: gr.lengthCm, lengthCm: gr.widthCm} : {...gr}))
+  const note = "Lay turned: cloth length runs along the table (grain kept)."
+  return {
+    ...g,
+    steps,
+    groups,
+    widthCm: g.groups ? g.widthCm : g.lengthCm,
+    lengthCm: g.groups ? g.lengthCm : g.widthCm,
+    rotatedLay: true,
+    fitWarnings: [...(g.fitWarnings || []), note],
+  }
+}

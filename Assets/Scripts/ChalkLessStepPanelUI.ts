@@ -15,6 +15,7 @@ import {FlexDirection} from "UIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTy
 import {child, CONTENT_Z, flexContainer, labeledButton, LabeledButton, textRow} from "./ChalkLessStyleUI"
 import {MeshAccumulator, tintedMaterial} from "./ChalkLessLines"
 import {P2} from "./ChalkLessPattern"
+import {approachAngle, smoothK, wrapAngle, yawQuat} from "./ChalkLessViewer"
 
 const DOT_R = 0.9
 const DOT_GAP = 1.4
@@ -73,6 +74,32 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
   private dotState = {index: -1, total: 0}
   private titleSize = 100
   private summaryH = 22
+  private baseRot: quat
+  private yaw = 0
+  private targetYaw = 0
+  /** Turn needed before the card re-faces the tailor (hysteresis, deg). */
+  private static readonly FACE_HYSTERESIS = (35 * Math.PI) / 180
+
+  /** Yaw (deg) the card uses to read upright for the tailor (0 = authored, tailor at +Z). */
+  get yawDeg(): number {
+    return (this.yaw * 180) / Math.PI
+  }
+
+  /**
+   * Turn the flat card about the vertical so it reads upright for the tailor. Small changes are ignored
+   * (hysteresis); otherwise it eases there in ~200 ms, or at once when `immediate` (before placement).
+   */
+  faceYaw(yaw: number, immediate: boolean): void {
+    if (Math.abs(wrapAngle(yaw - this.targetYaw)) > ChalkLessStepPanelUI.FACE_HYSTERESIS) this.targetYaw = wrapAngle(yaw)
+    if (immediate) {
+      this.yaw = this.targetYaw
+      this.applyYaw()
+    }
+  }
+
+  private applyYaw(): void {
+    this.sceneObject.getTransform().setWorldRotation(yawQuat(this.yaw).multiply(this.baseRot))
+  }
 
   /** Current step title text (for tests; never empty while cutting). */
   get labelText(): string {
@@ -87,6 +114,7 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
   }
 
   onAwake(): void {
+    this.baseRot = this.sceneObject.getTransform().getWorldRotation()
     this.sceneObject.createComponent("Component.Canvas")
     const plate = this.sceneObject.createComponent(BackPlate.getTypeName()) as BackPlate
     plate.style = "simple"
@@ -119,7 +147,14 @@ export class ChalkLessStepPanelUI extends BaseScriptComponent {
     this.dots = this.planeMesh("ProgressDots", this.mats.dim)
     this.leader = this.planeMesh("LeaderLine", this.mats.glow)
     this.buildSummaryCard(d)
-    this.createEvent("LateUpdateEvent").bind(() => this.updateLeader())
+    this.createEvent("LateUpdateEvent").bind(() => {
+      if (this.yaw !== this.targetYaw) {
+        this.yaw = approachAngle(this.yaw, this.targetYaw, smoothK(0.06))
+        if (Math.abs(wrapAngle(this.targetYaw - this.yaw)) < 0.002) this.yaw = this.targetYaw
+        this.applyYaw()
+      }
+      this.updateLeader()
+    })
   }
 
   /** A RenderMeshVisual whose MeshAccumulator XZ maps to this card's local (x, -y). */

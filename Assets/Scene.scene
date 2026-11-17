@@ -2975,9 +2975,12 @@
     patternStartOffset: true
     stepPanelX: true
     chalkMarginCm: true
+    followMoveCm: true
+    followTurnDeg: true
     debugJumpToStep: true
     debugStyleId: true
     debugMaxMeasurements: true
+    debugTailorOffset: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -2996,9 +2999,12 @@
       patternStartOffset: !<Vec2> {x: -18.000000, y: -2.000000}
       stepPanelX: !<float> 50.000000
       chalkMarginCm: !<float> 4.000000
+      followMoveCm: !<float> 60.000000
+      followTurnDeg: !<float> 45.000000
       debugJumpToStep: !<float> -1.000000
       debugStyleId: buba
       debugMaxMeasurements: false
+      debugTailorOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
   ScriptTypes:
     "":
       {}

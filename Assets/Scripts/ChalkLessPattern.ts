@@ -73,6 +73,8 @@ export interface PatternGeometry {
   /** Big styles: pieces shown one group at a time; each step's coords are local to its group. */
   groups?: LayGroup[]
   fitWarnings?: string[]
+  /** True when the whole lay (cloth included) was turned a quarter turn to run along the table. */
+  rotatedLay?: boolean
 }
 
 /** One garment style: everything Main needs to drive menu → measure → cut → summary. */

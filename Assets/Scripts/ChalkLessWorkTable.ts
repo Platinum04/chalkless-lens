@@ -33,6 +33,13 @@ export class ChalkLessWorkTable extends BaseScriptComponent {
   @ui.group_end
 
   private parts: SceneObject[] = []
+  private slabVisible = true
+
+  /** Hide the stand-in slab (and legs) once the real table/cloth was detected; the SceneObject stays as the anchor. */
+  setSlabVisible(on: boolean): void {
+    this.slabVisible = on
+    for (const p of this.parts) p.enabled = on
+  }
 
   /** Current slab size (cm). */
   get currentSize(): vec3 {
@@ -65,5 +72,6 @@ export class ChalkLessWorkTable extends BaseScriptComponent {
         }
       }
     }
+    for (const p of this.parts) p.enabled = this.slabVisible
   }
 }
