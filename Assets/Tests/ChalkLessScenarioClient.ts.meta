@@ -30,6 +30,7 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     only: false
+    runOnStart: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -40,8 +41,10 @@
     []
   DefaultScriptInputs:
     - only: ""
+      runOnStart: false
   ScriptTypes:
     -
       {}
   InputLines:
     - '// @input string only {"hint":"Only run the scenario with this id (empty = all)"}'
+    - '// @input bool runOnStart {"hint":"Run all LEAF scenarios when the Lens starts (turn on to test)"}'

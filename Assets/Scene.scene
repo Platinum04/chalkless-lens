@@ -7,6 +7,8 @@
     - !<own> f5d74682-203a-4970-81ea-9fa7b88c96bb
     - !<own> 73c349c3-1859-40bb-abe4-68d97e564c90
     - !<own> 9fc200e7-80f4-472f-9483-8c5f8ce80919
+    - !<own> 5a8f889d-2ff4-41df-aaf8-0c9a073cae4d
+    - !<own> d3e2f3da-623a-41ce-a191-f1a958b2c5a2
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       - id: 1
@@ -249,6 +251,7 @@
     panelWidth: true
     viewDistance: true
     title: true
+    buttonHeight: true
     titleColor: true
   ScriptTypesDefault:
     {}
@@ -257,6 +260,7 @@
       panelWidth: !<float> 32.000000
       viewDistance: !<float> 150.000000
       title: ChalkLess — choose a garment
+      buttonHeight: 5.500000
       titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
   ScriptTypes:
     "":
@@ -492,6 +496,22 @@
     []
   Components:
     []
+- !<ScriptComponent/1f2b3410-a393-4b70-b150-eb1145423cb3>
+  PrefabRemaps:
+    []
+  Name: LeafIndex
+  Enabled: true
+  ScriptAsset: !<reference> 58bf7914-b9f4-4c1d-8fdc-b8429cc06065
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<RenderMeshVisual/1f969daa-5809-4500-b314-98d91ccba131>
   PrefabRemaps:
     []
@@ -1062,6 +1082,22 @@
     - !<own> bf2095b6-c6f8-48c8-b840-e0a6cec0dc99
   Components:
     []
+- !<SceneObject/5a8f889d-2ff4-41df-aaf8-0c9a073cae4d>
+  PrefabRemaps:
+    []
+  Name: LeafIndex
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 1f2b3410-a393-4b70-b150-eb1145423cb3
+    - !<own> a143770a-3fc2-490b-a0a7-4cceebb45368
 - !<ScriptComponent/5c00aa8c-d9f4-4c20-abd4-3b59ea781c9b>
   PrefabRemaps:
     []
@@ -1322,6 +1358,22 @@
     - !<own> f666b5eb-6a03-4db0-9d84-5b34c6e8905a
   Components:
     []
+- !<ScriptComponent/75262400-d92e-418e-bb5e-f19c165fed46>
+  PrefabRemaps:
+    []
+  Name: MessagingBridge
+  Enabled: true
+  ScriptAsset: !<reference> 9aa407db-2872-4afc-a162-cf7faf2a0f29
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/7605c62c-4c45-4fc0-b364-2d76d26f2b82>
   PrefabRemaps:
     []
@@ -1768,6 +1820,24 @@
     []
   Components:
     - !<own> ed8cbd02-0538-46be-b2ec-7117eafbab09
+- !<ScriptComponent/a143770a-3fc2-490b-a0a7-4cceebb45368>
+  PrefabRemaps:
+    []
+  Name: ChalkLessScenarioClient
+  Enabled: true
+  ScriptAsset: !<reference> de6c0872-315a-4848-ada8-f24c177c8ee4
+  ScriptInputsDefault:
+    only: true
+    runOnStart: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      only: ""
+      runOnStart: false
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/a4b1ce71-4840-4493-bc52-58f3c13933e1>
   PrefabRemaps:
     []
@@ -2245,6 +2315,21 @@
     []
   Components:
     - !<own> 54b0f5c8-1c8d-43e8-bcc6-9680fcbaef90
+- !<SceneObject/d3e2f3da-623a-41ce-a191-f1a958b2c5a2>
+  PrefabRemaps:
+    []
+  Name: LEAF Plugin Bridge
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 75262400-d92e-418e-bb5e-f19c165fed46
 - !<ScriptComponent/d3e2fbc5-8795-4913-9af6-c8626f8e6d9c>
   PrefabRemaps:
     []
@@ -2759,6 +2844,7 @@
     stepPanelX: true
     chalkMarginCm: true
     debugJumpToStep: true
+    debugStyleId: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -2774,6 +2860,7 @@
       stepPanelX: !<float> 50.000000
       chalkMarginCm: !<float> 4.000000
       debugJumpToStep: !<float> -1.000000
+      debugStyleId: buba
   ScriptTypes:
     "":
       {}

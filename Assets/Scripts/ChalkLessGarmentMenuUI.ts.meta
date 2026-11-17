@@ -29,6 +29,7 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    buttonHeight: false
     panelWidth: false
     title: false
     titleColor: false
@@ -45,6 +46,7 @@
     - panelWidth: !<float> 32.000000
       viewDistance: !<float> 150.000000
       title: ChalkLess — choose a garment
+      buttonHeight: 5.500000
       titleColor: !<Vec4> {x: 0.850000, y: 0.950000, z: 1.000000, w: 1.000000}
   ScriptTypes:
     -
@@ -53,8 +55,9 @@
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessGarmentMenuUI – garment picker</span>"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
-    - '// @input float panelWidth = 32 {"hint":"Panel width in cm", "widget":"slider", "min":20, "max":50, "step":1}'
+    - '// @input float panelWidth = 36 {"hint":"Panel width in cm", "widget":"slider", "min":24, "max":50, "step":1}'
     - '// @input float viewDistance = 150 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
     - '// @input string title = "ChalkLess — choose a garment" {"hint":"Menu title"}'
+    - '// @input float buttonHeight = 5.5 {"hint":"Height of each style button (cm)", "widget":"slider", "min":4, "max":9, "step":0.5}'
     - '// @input vec4 titleColor = "{0.85, 0.95, 1, 1}" {"hint":"Title text colour (keep light — additive display)", "widget":"color"}'
     - '// @ui {"widget":"group_end"}'
