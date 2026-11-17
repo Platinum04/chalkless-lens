@@ -268,7 +268,7 @@ export class ChalkLessMain extends BaseScriptComponent {
     if (!this.baseTable && tt) this.baseTable = tt.currentSize
     const g = this.geometry
     const w = Math.max(this.baseFabric.x, Math.ceil(g.widthCm + 10))
-    const d = Math.max(this.baseFabric.z, Math.ceil(g.lengthCm + 8))
+    const d = Math.max(this.baseFabric.z, Math.ceil(g.lengthCm + 6))
     this.fabricEnlarged = w > this.baseFabric.x || d > this.baseFabric.z
     if (ft) ft.resize(new vec3(w, this.baseFabric.y, d))
     if (tt && this.baseTable) tt.resize(new vec3(Math.max(this.baseTable.x, w + 50), this.baseTable.y, Math.max(this.baseTable.z, d + 10)))
@@ -299,7 +299,7 @@ export class ChalkLessMain extends BaseScriptComponent {
     const a = this.pattern.currentLineAnchorWorld()
     const z = Math.min(f.z + 22, Math.max(f.z - 22, a.z))
     const c = this.pattern.patternCenterWorld
-    const x = Math.max(f.x + this.stepPanelX, c.x + this.geometry.widthCm / 2 + 16)
+    const x = Math.max(f.x + this.stepPanelX, c.x + this.geometry.widthCm / 2 + 21)
     this.stepPanel.moveTo(new vec3(x, f.y + 0.6, z))
   }
 }
