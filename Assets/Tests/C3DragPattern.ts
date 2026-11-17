@@ -15,7 +15,7 @@ export class C3DragPattern extends Scenario {
     await placeViaButtons(i, m)
     expect(m.pattern.isDraggable).toBe(true)
     const a = m.patternPosition
-    await i.pinchDrag("Pattern", new vec3(0.4, 0, 0.2), 1000)
+    await i.pinchDrag("Pattern", new vec3(1.0, 0, 0.5), 2000)
     const b = m.patternPosition
     print(`ChalkLessTest: pattern ${a.toString()} -> ${b.toString()}`)
     expect(b.sub(a).length).toBeGreaterThan(2)

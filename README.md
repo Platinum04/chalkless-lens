@@ -15,16 +15,17 @@ The tailor picks a style, enters the client's measurements, and the glasses lay 
 
 ## Styles
 
-| Style | Status |
+| Style | Cut order |
 |---|---|
-| Buba (top) | ✅ Working |
-| Kaftan (long / short sleeve) | Planned |
-| Agbada | Planned |
-| Dashiki | Planned |
-| Ladies' corset | Planned |
-| Wrapper skirt | Planned |
+| Buba (top) | fold → measure → neckline → shoulder → sleeve → side seam → hem |
+| Kaftan, long sleeve | fold → measure → neckline → placket → shoulder → sleeve → side seam + slit → hem |
+| Kaftan, short sleeve | same as long sleeve, with short sleeves |
+| Agbada | fold → measure → V-neck → embroidery panel (marked) → shoulder → sleeve opening → side seam → hem |
+| Dashiki | fold → measure → V-neck → yoke (marked) → shoulder + sleeve → sleeve end → underarm + side → hem |
+| Ladies' corset | fold → measure + grainlines → panels, front to back (6 panels, 11 pieces) |
+| Wrapper skirt | fold → measure → waistband → waist + side edges → hem |
 
-Each style is a pattern recipe: it builds the pattern pieces from the measurements and sets the order of the cuts. The fabric can be anything: ankara, aso-oke, lace, suit cloth or kaftan fabric.
+All styles work in the preview. Each style is a pattern recipe: it builds the pattern pieces from the measurements and sets the order of the cuts. The fabric can be anything: ankara, aso-oke, lace, suit cloth or kaftan fabric.
 
 ## Running it
 
