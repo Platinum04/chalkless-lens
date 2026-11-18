@@ -19,7 +19,7 @@ ChalkLess brings the pattern and cutting instructions to that work surface. Meas
 3. **Choose a style.** Pick one of 16 styles from the two-page garment menu.
 4. **Enter measurements.** Use the minus and plus buttons in steps of 1 or 5 cm. A small pattern preview changes with the values.
 5. **Place the pattern.** Align the full-size pattern on the fabric, then press **Start cutting**.
-6. **Cut step by step.** The current line glows. Cut steps show arrows and a dashed 1.5 cm seam allowance. A nearby step card shows the instruction, a count such as "Step 3 of 7", progress dots and **Next step**. Finished lines turn grey. Future lines stay faint. Press Next or say "next". Say "back" to revisit the previous step.
+6. **Cut step by step.** The current line glows. The solid glowing line is the actual cut. The dashed line inside it is the stitching. Allowances are per edge: neck 1 cm, body 1.5 cm and hem 3 cm. Cut steps also show arrows. A nearby step card shows the instruction, a count such as "Step 3 of 7", progress dots and **Next step**. Finished lines turn grey. Future lines stay faint. Press Next or say "next". Say "back" to revisit the previous step.
 7. **Read the summary.** The final card lists the pieces cut and an estimate of fabric saved against an assumed chalk layout. This is not a measured saving.
 
 Fold and measurement steps show guides and marks rather than cutting arrows.
@@ -47,7 +47,7 @@ Fold and measurement steps show guides and marks rather than cutting arrows.
 | Agbada (wide robe) | fold, measure, V-neck, embroidery panel (marked), shoulder, sleeve opening, side seam, hem |
 | Dashiki | fold, measure, V-neck, yoke (marked), shoulder and sleeve, sleeve end, underarm and side, hem |
 
-Each recipe builds pieces from measurements and defines their cut order. The drafting rules include pieces on the fold and a quarter chest or hip plus ease. Cut guides include 1.5 cm seam allowance. These are starting blocks, not patterns validated for every body or fabric.
+Each recipe builds pieces from measurements and defines their cut order. The drafting rules include pieces on the fold and a quarter chest or hip plus ease. Cut guides include per-edge allowances: neck 1 cm, body 1.5 cm and hem 3 cm. These are starting blocks, not patterns validated for every body or fabric.
 
 ## Table and fabric detection pipeline
 
@@ -62,9 +62,9 @@ The preview has no real camera feed for this workflow. A virtual table and fabri
 
 ## Walking around the table
 
-**In progress:** the design uses Specs' room tracking, with six degrees of freedom (6DoF/SLAM), to keep the pattern at the table's position. For a big agbada lay, the tailor should be able to walk to the other side and see the same pattern locked to the stationary cloth, like chalk.
+The pattern stays locked to the stationary cloth as the tailor walks around the table. Labels and the step card face the tailor, and floating panels follow. Long lays turn along the table with the cloth, keeping the grain direction relative to the cloth.
 
-The step card and labels are being adapted to face the tailor from wherever they stand. The pattern itself should stay flat on the fabric. This walk-around behavior is not yet proven on a Specs device. Saved anchors for leaving and returning are future work.
+Nearest-edge placement and far-side readability remain under review. Real Specs tracking and comfort still need device testing. Saved anchors for leaving and returning are future work.
 
 ## Voice
 
@@ -83,7 +83,7 @@ The **Next step button stays usable** whether voice is available or not. Voice m
 
 ## Tests
 
-The suite contains **23 tests** <!-- confirm count --> in `Assets/Tests/`:
+The suite contains **23 tests** in `Assets/Tests/`:
 
 | Group | Coverage |
 |---|---|
@@ -96,12 +96,14 @@ The suite contains **23 tests** <!-- confirm count --> in `Assets/Tests/`:
 
 The UI flow tests drive real SIK pinch and drag events in the preview. D2 uses synthetic pixels. V1 enters cutting through real button pinches, then injects text without a microphone.
 
-The progress log records the 20 flow tests passing. D2's rotated-rectangle image produced a worst corner error of about 0.71 pixels; its test tolerance is 2 pixels. This does not establish accuracy on real cloth. The latest full-suite pass count, including D1 and V1, still needs confirmation. <!-- confirm latest full-suite results with Claude -->
+All 23 tests passed in Preview 1 on 18 November 2026. Headless verification is pending. D2's rotated-rectangle image produced a worst corner error of about 0.71 pixels; its test tolerance is 2 pixels. This does not establish accuracy on real cloth. 
 
 `PROGRESS.md` describes the local test runner workaround. These checks establish preview logic, not real-world fit or cutting accuracy.
 
 ## Project layout
 
+- `Assets/Scripts/ChalkLessConstruction.ts`: joined cut allowances and whole-lay rotation with grain kept.
+- `Assets/Scripts/ChalkLessViewer.ts`: viewer position and walk-around facing helpers.
 - `Assets/Scripts/ChalkLessMain.ts`: phases, measurements, style selection and next/previous step actions.
 - `Assets/Scripts/ChalkLessPattern.ts`, `ChalkLessStyleRecipes.ts`, `ChalkLessGlobalRecipes.ts`: drafting maths and style recipes.
 - `Assets/Scripts/ChalkLess*UI.ts`, `ChalkLessGarmentIcons.ts`: menu, measurement pad, pattern, step card, summary and garment icons.
@@ -120,9 +122,9 @@ The progress log records the 20 flow tests passing. D2's rotated-rectangle image
 | Measurement-driven recipes and the 16-style cutting flow. | Garment fit and useful drafting accuracy with real tailors. |
 | Pinch/drag UI and one active step at a time. | Hand tracking while holding scissors, reach and comfort. |
 | Stand-in fallback and synthetic segmentation maths. | Real table hits, camera projection and detection across fabrics and lighting. |
-| Transcript matching and debounce in isolated checks; V1's final run is pending. | Spoken command reliability with a real microphone. |
+| Transcript matching, debounce and button fallback in V1. | Spoken command reliability with a real microphone. |
 
-Walk-around labels and cards are in progress. The detected fabric angle is not applied yet. Saved anchors are not built. The pattern does not follow cloth that is moved after alignment. The summary's fabric-saving figure is an estimate based on layout margins, not a measured comparison.
+Walk-around labels and cards are implemented in preview; far-side checks remain pending. The detected fabric angle is not applied yet. Saved anchors are not built. The pattern does not follow cloth that is moved after alignment. The summary's fabric-saving figure is an estimate based on layout margins, not a measured comparison.
 
 ## License
 
@@ -131,3 +133,4 @@ Copyright © 2026 Awodi Abdulmujeeb. The ChalkLess code and docs are released un
 Snap's packages included in this project (the Spectacles Interaction Kit, Spectacles UI Kit, LEAF and others in `Packages/`) belong to Snap Inc. and stay under their own licenses.
 
 Built for the Learn AR with SPECS hackathon.
+

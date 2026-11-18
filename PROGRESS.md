@@ -59,3 +59,12 @@
 - FIXED: plan-lens kept vanishing because Lens Studio Agents-Docs plugin deletes .agents/ on every project load ("Removed legacy .agents/ directory") and .claude/skills/plan-lens was a symlink into it. Now a real folder in .claude/skills/plan-lens; .agents/ untracked and gitignored.
 - UI Kit gradient BackPlate/Primary buttons only half-render in 5.25 preview; using "simple" BackPlate + "Prism" buttons (fainter).
 - Arrows/seam allowance only drawn on cut steps (not fold/measure): by design.
+
+## Handoff status: 18 November 2026
+
+Implemented: per-edge cut allowances, solid cuts and dashed stitching, long-lay rotation with grain kept, fast measurement taps, walk-around labels/card/panels and hidden stand-ins after detection.
+
+The earlier S2/S3/S4 timeouts came from PC sleep. S2 passes alone. All 23 tests passed in Preview 1. Headless did not run; both previews will be covered in final verification. Groups: C1 to C5, S1 to S6, G1 to G9, D1, D2 and V1.
+
+Open: split maximum-size lays for long kaftan, agbada, suit, joggers, palazzo, wrap dress and maxi; nearest-edge panels; far-side captures; debug reset; final full suite with PC awake; disable runner; preserve Lens Studio gitignore block. Keep runner files and local Devpost drafts out of commits.
+
