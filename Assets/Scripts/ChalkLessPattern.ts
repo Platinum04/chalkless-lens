@@ -282,7 +282,7 @@ export function splitLayGroups(g: PatternGeometry, names: string[], ids: string[
   })
   let previous = 0
   for (const st of steps) if (st.lines.length > 0 && st.id !== "fold") {
-    if (st.group !== previous) st.label = `${names[st.group || 0]} lay: ${st.label}`
+    if (st.group !== previous) st.label = st.label.replace(" · ", ` (${names[st.group || 0]} lay) · `)
     previous = st.group || 0
   }
   return {...g, steps, groups}

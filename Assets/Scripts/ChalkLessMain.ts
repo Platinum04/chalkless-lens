@@ -90,8 +90,8 @@ export class ChalkLessMain extends BaseScriptComponent {
   @ui.separator
   @ui.group_start("Debug")
   @input
-  @hint("Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0.. = cutting step, last+1 = summary")
-  @widget(new SliderWidget(-3, 12, 1))
+  @hint("Jump to a stage at launch for review: -4 = table finder, -3 = measurement pad, -2 = align pattern, -1 = normal start, 0.. = cutting step, last+1 = summary")
+  @widget(new SliderWidget(-4, 12, 1))
   debugJumpToStep: number = -1
   @input
   @hint("Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper, suit, blazer, joggers, palazzo, bubu, aLineDress, sheathDress, wrapDress, maxiGown")
@@ -178,6 +178,10 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.initFollow()
     this.createEvent("UpdateEvent").bind(() => this.updateFollow())
     this.restart()
+    if (this.tableFinder && this.debugJumpToStep === -4) {
+      this.findTable(true)
+      return
+    }
     // First start only: find the real table (device). Preview falls back at once, so this stays on "menu".
     if (this.tableFinder && this.debugJumpToStep === -1) {
       this.findTable(false)
@@ -613,12 +617,13 @@ export class ChalkLessMain extends BaseScriptComponent {
       this.followAz = Math.abs(az) < (this.followTurnDeg * Math.PI) / 360 ? 0 : az
       if (this.phase === "cutting" || this.phase === "align") this.placeStepPanel()
     }
-    if (this.followYaw === this.followAz && this.followSettled) return
+    const size = this.pattern.fabricSize
+    if (this.followYaw === this.followAz && this.followSettled && size.x === this.followSize.x && size.y === this.followSize.y) return
     this.followYaw = wrapAngle(this.followYaw + wrapAngle(this.followAz - this.followYaw) * smoothK(0.06))
     if (Math.abs(wrapAngle(this.followAz - this.followYaw)) < 0.002) this.followYaw = this.followAz
     const f = this.fabric.getTransform().getWorldPosition()
     const q = yawQuat(this.followYaw)
-    const size = this.pattern.fabricSize
+    this.followSize = new vec2(size.x, size.y)
     const sx = Math.sin(this.followYaw), sz = Math.cos(this.followYaw)
     const edge = Math.min((size.x / 2 - 6) / Math.max(Math.abs(sx), 0.001), (size.y / 2 - 6) / Math.max(Math.abs(sz), 0.001))
     for (const p of this.follow) {
@@ -629,6 +634,7 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.followSettled = this.followYaw === this.followAz
   }
   private followSettled = false
+  private followSize = new vec2(0, 0)
 
   private placeStepPanel(): void {
     if (this.phase === "cutting" && this.placeCardNearActiveLine()) return

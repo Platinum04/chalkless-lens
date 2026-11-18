@@ -26,6 +26,14 @@
 - Voice "next"/"back": delegated to Codex, brief in devpost/codex-voice-brief.md (Codex owns ChalkLessVoice.ts, Main.previous(), Tests/V1VoiceCommands.ts)
 - UX pass (2026-11-17): step card + progress dots + leader line, ±5 buttons, menu icons, align-stage measurement card, confirm flash. All 20 LEAF tests PASS in both previews afterwards.
 - "Make it solid" done (2026-11-17): labels clamped inside fabric/wrap to 2 lines, mark labels de-overlapped; Suit shows jacket then trousers lay, Maxi bodice then skirt (fabric ≤ ~157x110); brighter teal buttons with hover/pinch states. All 20 LEAF tests PASS in both previews afterwards.
+- BUILD COMPLETE (2026-11-18): table + fabric detection, voice next/back, real cut line outside with dashed stitch line inside (per-edge allowances), long lays turned along the table with grain kept, big lays split into groups, walk-around (labels/card face the tailor, panels follow to the nearest edge), "Large size: slide the cloth" note for max Agbada/Maxi. 23 LEAF tests: all PASS in Preview 1 (2026-11-18, final code); all PASS in both previews on the code before the last small changes. Repo safety checked: no tokens tracked, drafts local, LICENSE present.
+
+## Left for the user (no more build work)
+1. Walkthrough in Interactive Preview with the brief's comfort checklist
+2. Real tailor check using devpost/pattern-review.md (local)
+3. Demo video (<3 min, public YouTube) from devpost/video-script.md (local)
+4. Make repo public; paste devpost/submission.md (local) into Devpost; submit by Dec 1-2 (deadline Dec 5)
+- Note: after a Lens Studio restart the Headless preview may not start; Preview 1 results are enough. Keep the PC awake during test runs (sleep froze a run once).
 
 ## UX phase todo (from solid-phase review + user's design concept image)
 - Progress dots ("Step 3 of 7") near the step card; garment icons on menu buttons; small measurement summary card with "Edit measurements"

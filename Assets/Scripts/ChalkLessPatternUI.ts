@@ -98,6 +98,7 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
   private currentStep = -1
   private states: LineState[] = []
   private activeLabel: Text
+  private largeSizeNote: Text
   /** Flat text lying on the fabric (active label + mark labels); turned about the vertical to face the tailor. */
   private flatLabels: SceneObject[] = []
   private labelYaw = 0
@@ -179,6 +180,19 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     this.activeLabel.layoutRect = Rect.create(-20, 20, -2, 2)
     lo.enabled = false
 
+    const note = global.scene.createSceneObject("LargeSizeNote")
+    note.setParent(this.content)
+    note.getTransform().setLocalRotation(FLAT)
+    this.largeSizeNote = note.createComponent("Component.Text") as Text
+    this.largeSizeNote.depthTest = true
+    this.largeSizeNote.size = textSizeForHeight(2)
+    this.largeSizeNote.textFill.color = new vec4(1, 0.95, 0.65, 1)
+    this.largeSizeNote.horizontalAlignment = HorizontalAlignment.Center
+    this.largeSizeNote.verticalAlignment = VerticalAlignment.Center
+    this.largeSizeNote.layoutRect = Rect.create(-32, 32, -4, 4)
+    this.largeSizeNote.text = "Large size: lay continues past the table edge, slide the cloth"
+    note.enabled = false
+
     this.collider = this.sceneObject.createComponent("Physics.ColliderComponent") as ColliderComponent
     this.collider.fitVisual = false
     this.collider.debugDrawEnabled = this.debugColliders
@@ -252,9 +266,12 @@ export class ChalkLessPatternUI extends BaseScriptComponent {
     this.geometry = g
     for (const v of this.visuals) v.root.destroy()
     this.visuals = []
-    this.flatLabels = [this.activeLabel.getSceneObject()]
+    this.flatLabels = [this.activeLabel.getSceneObject(), this.largeSizeNote.getSceneObject()]
     this.content.getTransform().setLocalPosition(new vec3(0, 0.15, 0))
     const lay = shownLaySize(g)
+    const oversized = g.groups ? g.groups.some((gr) => gr.widthCm > 172 || gr.lengthCm > 107) : g.widthCm > 172 || g.lengthCm > 107
+    this.largeSizeNote.getSceneObject().enabled = oversized
+    this.largeSizeNote.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0.65, Math.min(lay[1] / 2 - 5, 30)))
     const shape = Shape.createBoxShape()
     shape.size = new vec3(lay[0], 2, lay[1])
     this.collider.shape = shape

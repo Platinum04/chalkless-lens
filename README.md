@@ -1,6 +1,6 @@
 # ChalkLess: cut right the first time
 
-ChalkLess is a Lens for **Snap Specs** that guides tailors through cutting a garment. A pattern lies at real size on the fabric. One line glows at a time, with a label, direction arrows and a dashed seam allowance.
+ChalkLess is a Lens for **Snap Specs** that guides tailors through cutting a garment. A pattern lies at real size on the fabric. One line glows at a time, with a label, direction arrows and a dashed stitching line inside the solid cutting line.
 
 Chalk lines and paper patterns take time to transfer and check. One wrong cut on expensive cloth costs both the tailor and the client. ChalkLess aims to make the next cut clear while the tailor keeps their eyes on the fabric.
 
@@ -79,7 +79,7 @@ The **Next step button stays usable** whether voice is available or not. Voice m
 - **Open:** `chalkless-lens.esproj` in **Lens Studio 5.25 or later**, with the Specs target.
 - **Interactive Preview controls:** clicking acts as a pinch. WASD moves, Q and E go down and up, and right-drag looks around.
 - **Stand-in:** a virtual cutting table and fabric replace real camera detection in the preview. The fabric starts at 150 × 80 cm and grows for larger lays.
-- **Large patterns:** the suit shows the jacket lay, then the trousers. The maxi gown separates bodice and skirt lays.
+- **Large patterns:** long kaftan separates body and sleeves. Suit separates jacket body, sleeve/collar, trouser front, trouser back and waistband. Joggers and palazzo separate the legs and bands. Wrap dress separates back, wrap fronts and sleeves/ties. Maxi separates bodice and skirt. Step order and step ids stay unchanged.
 
 ## Tests
 
@@ -116,6 +116,10 @@ All 23 tests passed in Preview 1 on 18 November 2026. Headless verification is p
 - `devpost/submission.md`: the Devpost write-up draft.
 
 ## Status and limits
+
+Maximum-size Agbada and Maxi contain single pieces larger than the table. Their shapes and true scale are preserved. An on-fabric note says: **Large size: lay continues past the table edge, slide the cloth**. Sliding and re-alignment need tailor approval before cutting real fabric. The pattern stays locked in world space and does not track moving cloth; realign it after moving the cloth.
+
+The largest Agbada body is about 170 × 124 cm; the largest Maxi skirt lay is about 146 × 118 cm, including cutting allowances. These limits cannot be removed by separating existing pieces into more lays.
 
 | Logic proven in preview | Feel unproven on a Specs device |
 |---|---|

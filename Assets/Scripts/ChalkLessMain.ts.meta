@@ -107,7 +107,7 @@
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"group_start", "label":"Debug"}'
-    - '// @input float debugJumpToStep = -1 {"hint":"Jump to a stage at launch for review: -1 = normal start (menu), -3 = measurement pad, -2 = align pattern, 0.. = cutting step, last+1 = summary", "widget":"slider", "min":-3, "max":12, "step":1}'
+    - '// @input float debugJumpToStep = -1 {"hint":"Jump to a stage at launch for review: -4 = table finder, -3 = measurement pad, -2 = align pattern, -1 = normal start, 0.. = cutting step, last+1 = summary", "widget":"slider", "min":-4, "max":12, "step":1}'
     - '// @input string debugStyleId = "buba" {"hint":"Style used by the debug jump: buba, kaftanLong, kaftanShort, agbada, dashiki, corset, wrapper, suit, blazer, joggers, palazzo, bubu, aLineDress, sheathDress, wrapDress, maxiGown"}'
     - '// @input bool debugMaxMeasurements {"hint":"Debug jump uses every measurement at its maximum (checks that big lays still fit)"}'
     - "// @input vec3 debugTailorOffset = {0,0,0} {\"hint\":\"Walk-around review: pretend the tailor's head is here (world cm, relative to the fabric centre). 0,0,0 = use the real head.\"}"
