@@ -14,6 +14,7 @@ import {
   easeCurve,
   finishLayout,
   splitLay,
+  splitLayGroups,
   Mark,
   MeasurementDef,
   Measurements,
@@ -202,7 +203,7 @@ function buildSuit(m: Measurements): PatternGeometry {
     cutStep("waistband", [band], [t.right + G + 4, tz + bandLength / 2], `Cut waistband · ${r(bandLength)} × 8 cm; 3 cm overlap`, true),
   ]
   // 197 × 146 cm in one lay is bigger than the table: show the jacket lay, then the trouser lay.
-  return splitLay(finishLayout(steps), ["Jacket", "Trousers"], ["trouserFront", "trouserBack", "waistband"])
+  return splitLayGroups(finishLayout(steps), ["Jacket body", "Sleeve and collar", "Trouser front", "Trouser back", "Waistband"], [[], ["sleeve", "collar"], ["trouserFront"], ["trouserBack"], ["waistband"]])
 }
 
 const SUIT: StyleRecipe = {
@@ -300,7 +301,7 @@ function buildJoggers(m: Measurements): PatternGeometry {
     cutStep("waistband", [band], [bx + bandW / 2, bandL / 2], `Cut elastic waistband · ${r(bandL)} × ${r(bandW)} cm`, true),
     cutStep("cuff", [cuff], [cx + cuffH / 2, cuffL / 2], `Cut ankle cuff · ${r(cuffL)} × ${r(cuffH)} cm (cut 2)`, true),
   ]
-  const geometry = finishLayout(steps)
+  const geometry = splitLayGroups(finishLayout(steps), ["Front legs", "Back legs", "Band and cuffs"], [[], ["back"], ["waistband", "cuff"]])
   geometry.fitWarnings = [`Stretch cuffs must extend ${Math.ceil(800 / m.hemWidth)}% to fit the leg opening. Test the rib fabric first.`]
   return geometry
 }
@@ -337,7 +338,7 @@ function buildPalazzo(m: Measurements): PatternGeometry {
     cutStep("back", [t.back], t.backC, `Cut wide-leg back · ${len(t.back)} cm outline`, true, [bodyAllowances(t.back)]),
     cutStep("waistband", [band], [bx + 5, bandLength / 2], `Cut waistband · ${r(bandLength)} × 10 cm; 3 cm overlap`, true),
   ]
-  return finishLayout(steps)
+  return splitLayGroups(finishLayout(steps), ["Front legs", "Back legs", "Waistband"], [[], ["back"], ["waistband"]])
 }
 
 const PALAZZO: StyleRecipe = {
@@ -642,7 +643,7 @@ function buildWrap(m: Measurements): PatternGeometry {
     cutStep("sleeve", [sleeve], [sx + m.sleeveLength / 2, sw / 2], `Cut sleeve · ${len(sleeve)} cm outline`, true),
     cutStep("tie", [tie], [tx + 4, tieL / 2], `Cut tie belt · ${r(tieL)} × 8 cm (cut 2)`, true),
   ]
-  return finishLayout(steps)
+  return splitLayGroups(finishLayout(steps), ["Back", "Wrap fronts", "Sleeves and ties"], [[], ["wrapFront"], ["sleeve", "tie"]])
 }
 
 const WRAP: StyleRecipe = {

@@ -207,8 +207,13 @@ export function finishLayout(steps: StepGeometry[], allowTranspose = false): Pat
  * The fold line is clipped to group 0; measure marks go to the group whose pieces contain them.
  */
 export function splitLay(g: PatternGeometry, names: [string, string], group1Ids: string[]): PatternGeometry {
-  const grp = (st: StepGeometry): number => (st.id && group1Ids.indexOf(st.id) >= 0 ? 1 : 0)
-  const box = [0, 1].map(() => ({x0: Infinity, z0: Infinity, x1: -Infinity, z1: -Infinity}))
+  return splitLayGroups(g, names, [[], group1Ids])
+}
+
+/** Keep complete pieces together while allowing several fresh-cloth lays. Step ids and order stay fixed. */
+export function splitLayGroups(g: PatternGeometry, names: string[], ids: string[][]): PatternGeometry {
+  const grp = (st: StepGeometry): number => Math.max(0, ids.findIndex((list) => list.indexOf(st.id || "") >= 0))
+  const box = names.map(() => ({x0: Infinity, z0: Infinity, x1: -Infinity, z1: -Infinity}))
   const grow = (k: number, p: P2): void => {
     const b = box[k]
     b.x0 = Math.min(b.x0, p[0])
@@ -223,7 +228,15 @@ export function splitLay(g: PatternGeometry, names: [string, string], group1Ids:
   }
   const markGroup = (mk: Mark): number => {
     const mid: P2 = [(mk.a[0] + mk.b[0]) / 2, (mk.a[1] + mk.b[1]) / 2]
-    return inside(1, mid) && !inside(0, mid) ? 1 : 0
+    const found = box.findIndex((_, k) => inside(k, mid))
+    if (found >= 0) return found
+    // Dimension marks often sit just outside a piece. Associate them with the closest lay.
+    let best = 0, distance = Infinity
+    box.forEach((b, k) => {
+      const d = Math.hypot(Math.max(b.x0 - mid[0], 0, mid[0] - b.x1), Math.max(b.z0 - mid[1], 0, mid[1] - b.z1))
+      if (d < distance) {best = k; distance = d}
+    })
+    return best
   }
   // Marks extend their group's box a little (labels sit beside them).
   for (const st of g.steps) for (const mk of st.marks) {
@@ -267,9 +280,12 @@ export function splitLay(g: PatternGeometry, names: [string, string], group1Ids:
     const l = b.z1 - b.z0
     return {name: names[k], widthCm: turn[k] ? l : w, lengthCm: turn[k] ? w : l}
   })
-  const firstNewLay = steps.find((st) => st.group === 1 && st.lines.length > 0)
-  if (firstNewLay) firstNewLay.label = firstNewLay.label.replace(" · ", " on fresh cloth · ")
-  return {widthCm: g.widthCm, lengthCm: g.lengthCm, steps, transposed: g.transposed, groups}
+  let previous = 0
+  for (const st of steps) if (st.lines.length > 0 && st.id !== "fold") {
+    if (st.group !== previous) st.label = `${names[st.group || 0]} lay: ${st.label}`
+    previous = st.group || 0
+  }
+  return {...g, steps, groups}
 }
 
 /** Size of the lay actually shown on the fabric at once (largest group, or the whole lay). */

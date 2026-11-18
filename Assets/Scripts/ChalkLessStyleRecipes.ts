@@ -15,6 +15,7 @@ import {
   cutStep,
   easeCurve,
   finishLayout,
+  splitLay,
   Mark,
   MeasurementDef,
   Measurements,
@@ -113,7 +114,7 @@ function buildKaftan(m: Measurements, long: boolean): PatternGeometry {
     cutStep("sideSeam", [side], bodyC, `Cut side seam · ${len(side)} cm, slit open last ${r(m.slit)} cm`),
     cutStep("hem", [hem], bodyC, `Cut hem · ${len(hem)} cm at the ankle`),
   ]
-  const geometry = finishLayout(steps)
+  const geometry = long ? splitLay(finishLayout(steps), ["Body", "Sleeves"], ["sleeve"]) : finishLayout(steps)
   geometry.fitWarnings = fittedSleeve.warning ? [fittedSleeve.warning] : []
   return geometry
 }

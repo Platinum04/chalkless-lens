@@ -174,7 +174,7 @@ export class ChalkLessMain extends BaseScriptComponent {
     this.stepPanel.onStartCutting.add(() => this.startCutting())
     this.stepPanel.onNext.add(() => this.next())
     this.summary.onRestart.add(() => this.restart())
-    if (this.debugTailorOffset.length > 0) setViewerOverride(this.fabric.getTransform().getWorldPosition().add(this.debugTailorOffset))
+    setViewerOverride(this.debugTailorOffset.length > 0 ? this.fabric.getTransform().getWorldPosition().add(this.debugTailorOffset) : null)
     this.initFollow()
     this.createEvent("UpdateEvent").bind(() => this.updateFollow())
     this.restart()
@@ -434,10 +434,10 @@ export class ChalkLessMain extends BaseScriptComponent {
       const needRight = Math.min(w / 2 + 23, Math.max(this.stepPanelX, startX + lay.x / 2 + 26)) + 24
       const extra = Math.max(0, needRight - tw / 2)
       tw += extra
-      tt.resize(new vec3(tw, this.baseTable.y, Math.max(this.baseTable.z, d + 4)))
+      tt.resize(new vec3(Math.max(w, Math.min(180, tw)), this.baseTable.y, Math.max(this.baseTable.z, d + 4)))
       const tr = this.tableObj.getTransform()
       if (!this.baseTablePos) this.baseTablePos = tr.getLocalPosition()
-      tr.setLocalPosition(new vec3(this.baseTablePos.x + extra / 2, this.baseTablePos.y, this.baseTablePos.z))
+      tr.setLocalPosition(this.baseTablePos)
     }
     this.pattern.fabricSize = new vec2(w, d)
     const f = this.fabric.getTransform().getWorldPosition()
@@ -571,7 +571,7 @@ export class ChalkLessMain extends BaseScriptComponent {
     if (wt) wt.setSlabVisible(on)
   }
 
-  /** Floating panels (menu, measure pad, summary, table finder) keep their authored offset from the fabric. */
+  /** Floating panels keep their authored height and face the tailor from the nearest fabric edge. */
   private initFollow(): void {
     const f = this.fabric.getTransform().getWorldPosition()
     const add = (so: SceneObject | null | undefined): void => {
@@ -618,9 +618,12 @@ export class ChalkLessMain extends BaseScriptComponent {
     if (Math.abs(wrapAngle(this.followAz - this.followYaw)) < 0.002) this.followYaw = this.followAz
     const f = this.fabric.getTransform().getWorldPosition()
     const q = yawQuat(this.followYaw)
+    const size = this.pattern.fabricSize
+    const sx = Math.sin(this.followYaw), sz = Math.cos(this.followYaw)
+    const edge = Math.min((size.x / 2 - 6) / Math.max(Math.abs(sx), 0.001), (size.y / 2 - 6) / Math.max(Math.abs(sz), 0.001))
     for (const p of this.follow) {
       const t = p.so.getTransform()
-      t.setWorldPosition(f.add(q.multiplyVec3(p.offset)))
+      t.setWorldPosition(f.add(new vec3(sx * edge, p.offset.y, sz * edge)))
       t.setWorldRotation(q.multiply(p.rot))
     }
     this.followSettled = this.followYaw === this.followAz
