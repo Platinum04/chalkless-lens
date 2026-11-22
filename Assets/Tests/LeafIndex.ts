@@ -23,6 +23,8 @@ import {G9MaxiGown} from "./G9MaxiGown"
 import {D1DetectionFallback} from "./D1DetectionFallback"
 import {D2FabricSegmentation} from "./D2FabricSegmentation"
 import {V1VoiceCommands} from "./V1VoiceCommands"
+import {W1Welcome} from "./W1Welcome"
+import {DemoVideo} from "./DemoVideo"
 
 @component
 export class LeafIndex extends BaseScriptComponent {
@@ -51,5 +53,7 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "d1-detection-fallback", typename: D1DetectionFallback.getTypeName()},
     {id: "d2-fabric-segmentation", typename: D2FabricSegmentation.getTypeName()},
     {id: "v1-voice-commands", typename: V1VoiceCommands.getTypeName()},
+    {id: "w1-welcome", typename: W1Welcome.getTypeName()},
+    {id: "demo-video", typename: DemoVideo.getTypeName()},
   ]
 }

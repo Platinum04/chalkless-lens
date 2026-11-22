@@ -14,6 +14,7 @@ ChalkLess brings the pattern and cutting instructions to that work surface. Meas
 
 ## How it works
 
+0. **Welcome.** On first use a short card explains the idea and the gestures. **Start, don't show again** skips it next time.
 1. **Find the table.** The table finder uses World Query to look for a level surface. The tailor confirms it with a pinch. The preview uses a virtual table instead.
 2. **Find the fabric or align by hand.** The fabric finder analyses a camera frame and projects the detected corners onto the table plane. If detection is unavailable, pinch-drag the pattern into place. The detected fabric angle is not applied yet.
 3. **Choose a style.** Pick one of 16 styles from the two-page garment menu.
@@ -83,7 +84,7 @@ The **Next step button stays usable** whether voice is available or not. Voice m
 
 ## Tests
 
-The suite contains **23 tests** in `Assets/Tests/`:
+The suite contains **24 tests** in `Assets/Tests/`:
 
 | Group | Coverage |
 |---|---|
@@ -93,10 +94,11 @@ The suite contains **23 tests** in `Assets/Tests/`:
 | D1 | Detection fallback and the table prompt's Skip button. |
 | D2 | Synthetic fabric segmentation, detected angle and projection maths. |
 | V1 | Injected voice transcripts, next/back, line states, debounce and the Next button. |
+| W1 | First-run welcome card: shows before the table step and Start (real pinch) moves on. |
 
 The UI flow tests drive real SIK pinch and drag events in the preview. D2 uses synthetic pixels. V1 enters cutting through real button pinches, then injects text without a microphone.
 
-All 23 tests passed in Preview 1 on 18 November 2026. Headless verification is pending. D2's rotated-rectangle image produced a worst corner error of about 0.71 pixels; its test tolerance is 2 pixels. This does not establish accuracy on real cloth. 
+All 24 tests passed in Preview 1 on 22 November 2026. Headless verification is pending. D2's rotated-rectangle image produced a worst corner error of about 0.71 pixels; its test tolerance is 2 pixels. This does not establish accuracy on real cloth. 
 
 `PROGRESS.md` describes the local test runner workaround. These checks establish preview logic, not real-world fit or cutting accuracy.
 

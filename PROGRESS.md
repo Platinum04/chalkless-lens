@@ -76,3 +76,11 @@ The earlier S2/S3/S4 timeouts came from PC sleep. S2 passes alone. All 23 tests 
 
 Open: split maximum-size lays for long kaftan, agbada, suit, joggers, palazzo, wrap dress and maxi; nearest-edge panels; far-side captures; debug reset; final full suite with PC awake; disable runner; preserve Lens Studio gitignore block. Keep runner files and local Devpost drafts out of commits.
 
+
+## Update: 22 November 2026
+
+- Welcome card added (ChalkLessWelcomeUI, WelcomePanel): first-run card before the table step, with Start and "Start, don't show again" (saved in persistent storage).
+- New test W1 (welcome card, real pinch). 24 LEAF tests: all PASS in Preview 1 on 22 November 2026, with the runner switched off afterwards.
+- DemoVideo scenario (Assets/Tests/DemoVideo.ts) plays a paced, hands-free run for recording. Run it with ChalkLessScenarioClient: runOnStart on, only = "demo-video".
+- Tailor check done. Demo video published: https://youtu.be/cPVSwdKNFWc
+- Left: make the repo public (or share it with the Devpost testers), paste devpost/submission.md (local) into Devpost and submit.

@@ -26,6 +26,8 @@ export class ChalkLessScenarioClient extends BaseScriptComponent {
   private async runAll(): Promise<void> {
     const mgr = DefaultScenarioManager.getInstance()
     await sleep(2000)
+    if (getMain().phase === "welcome") getMain().skipWelcome()
+    await sleep(300)
     for (const id of mgr.listScenarioIds()) {
       if (this.only && id !== this.only) continue
       getMain().restart()

@@ -19,8 +19,9 @@ import {prepareCuttingGeometry, rotateLongLay} from "./ChalkLessConstruction"
 import {readingYaw, setViewerOverride, smoothK, viewerPosition, wrapAngle, yawQuat} from "./ChalkLessViewer"
 import {ChalkLessTableFinder, TableSurface} from "./ChalkLessTableFinder"
 import {ChalkLessFabricFinder, FabricRect} from "./ChalkLessFabricFinder"
+import {ChalkLessWelcomeUI} from "./ChalkLessWelcomeUI"
 
-export type Phase = "findTable" | "menu" | "measure" | "align" | "cutting" | "done"
+export type Phase = "welcome" | "findTable" | "menu" | "measure" | "align" | "cutting" | "done"
 
 @component
 export class ChalkLessMain extends BaseScriptComponent {
@@ -49,6 +50,10 @@ export class ChalkLessMain extends BaseScriptComponent {
   @hint("Optional: World Query table finder (first start only; preview falls back to the stand-in)")
   @allowUndefined
   tableFinder: ChalkLessTableFinder
+  @input
+  @hint("Optional: first-run welcome card (shown before finding the table)")
+  @allowUndefined
+  welcome: ChalkLessWelcomeUI
   @input
   @hint("Optional: camera fabric finder (runs after the table is confirmed)")
   @allowUndefined
@@ -183,6 +188,7 @@ export class ChalkLessMain extends BaseScriptComponent {
       return
     }
     // First start only: find the real table (device). Preview falls back at once, so this stays on "menu".
+    if (this.debugJumpToStep === -1 && this.showWelcome()) return
     if (this.tableFinder && this.debugJumpToStep === -1) {
       this.findTable(false)
       return
@@ -205,6 +211,38 @@ export class ChalkLessMain extends BaseScriptComponent {
     for (const d of this.recipe.measurements) this.measurements[d.key] = d.maxCm
     this.refreshGeometry()
     this.pushMeasurement()
+  }
+
+  private welcomeBound = false
+  private static readonly WELCOME_KEY = "chalkless_hideWelcome"
+
+  /** First-run welcome card. force shows it even after "don't show again" (tests, demo). Returns true if shown. */
+  showWelcome(force = false): boolean {
+    if (!this.welcome) return false
+    const store = global.persistentStorageSystem.store
+    if (!force && store.has(ChalkLessMain.WELCOME_KEY) && store.getBool(ChalkLessMain.WELCOME_KEY)) return false
+    if (!this.welcomeBound) {
+      this.welcomeBound = true
+      this.welcome.onStart.add((dontShow) => this.onWelcomeStart(dontShow))
+    }
+    this.phase = "welcome"
+    this.garmentMenu.hide()
+    this.welcome.show()
+    print("ChalkLess: phase=welcome")
+    return true
+  }
+
+  /** Leave the welcome card as if Start was pressed (test runner). */
+  skipWelcome(): void {
+    this.onWelcomeStart(false)
+  }
+
+  private onWelcomeStart(dontShow: boolean): void {
+    if (this.phase !== "welcome") return
+    if (dontShow) global.persistentStorageSystem.store.putBool(ChalkLessMain.WELCOME_KEY, true)
+    this.welcome.hide()
+    if (this.tableFinder) this.findTable(false)
+    else this.restart()
   }
 
   /** True once the table phase has finished (confirmed, skipped or fell back). */
@@ -258,6 +296,7 @@ export class ChalkLessMain extends BaseScriptComponent {
   }
 
   restart(): void {
+    if (this.welcome) this.welcome.hide()
     this.phase = "menu"
     this.setRecipe(BUBA)
     this.pattern.setCurrentStep(-1)

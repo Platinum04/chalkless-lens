@@ -1,0 +1,54 @@
+- !<AssetImportMetadata/8c05e94e-e8b4-4af7-9c0e-fe85f1092629>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 9e41a09e-e681-4ced-8b34-2e3f4f546e29
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 9e41a09e-e681-4ced-8b34-2e3f4f546e29
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 8566d5a8-1975-43d8-a1f6-1ef0d51f7c0b
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/8566d5a8-1975-43d8-a1f6-1ef0d51f7c0b>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  RunInEditor: false
+  ComponentUid: 9196e08c-5a2f-43da-8e30-d15f3304b0bb
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    panelWidth: false
+    viewDistance: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - panelWidth: !<float> 36.000000
+      viewDistance: !<float> 110.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">ChalkLessWelcomeUI – first-run welcome card</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float panelWidth = 36 {"hint":"Panel width in cm", "widget":"slider", "min":20, "max":60, "step":1}'
+    - '// @input float viewDistance = 110 {"hint":"Viewing distance used to scale text (cm)", "widget":"slider", "min":60, "max":250, "step":1}'
+    - '// @ui {"widget":"group_end"}'
